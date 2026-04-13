@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/admin/index/index",
+    "pages/admin/users/users",
+    "pages/admin/user-form/user-form",
+    "pages/index/index",
+    "pages/course/detail/detail",
+    "pages/course/resources/resources",
+    "pages/course/video-player/video-player",
+    "pages/course/text-preview/text-preview",
+    "pages/course/monitor/monitor",
+    "pages/course/recommendations/recommendations",
+    "pages/course/exams/exams",
+    "pages/course/exam-detail/exam-detail",
+    "pages/course/exam-grading/exam-grading",
+    "pages/course/exam-attempt-grade/exam-attempt-grade",
+    "pages/course/assignments/assignments",
+    "pages/course/assignment-detail/assignment-detail",
+    "pages/course/exam-create/exam-create",
+    "pages/course/assignment-create/assignment-create",
+    "pages/course/exam-do/exam-do",
+    "pages/course/exam-stats/exam-stats",
+    "pages/course/exam-analysis/exam-analysis",
+    "pages/course/grade/grade",
+    "pages/course/checkin/checkin",
+    "pages/course/checkin-stats/checkin-stats",
+    "pages/course/members/members",
+    "pages/login/login"
+  ],
+  "window": {
+    "navigationBarTitleText": "在线课堂",
+    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#ffffff"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

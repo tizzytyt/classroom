@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.GradeMapper">
+  <resultMap id="FinalMap" type="com.edu.classroom.entity.CourseFinalGrade">
+    <id property="id" column="id"/>
+    <result property="courseId" column="course_id"/>
+    <result property="studentId" column="student_id"/>
+    <result property="assignmentScore" column="assignment_score"/>
+    <result property="checkinScore" column="checkin_score"/>
+    <result property="resourceScore" column="resource_score"/>
+    <result property="examScore" column="exam_score"/>
+    <result property="finalScore" column="final_score"/>
+    <result property="calculatedAt" column="calculated_at"/>
+  </resultMap>
+
+  <select id="findFinal" resultMap="FinalMap">
+    select * from course_final_grade where course_id = #{courseId} and student_id = #{studentId} limit 1
+  </select>
+
+  <select id="listFinalScoresForCourse" resultType="double">
+    select cfg.final_score
+    from course_final_grade cfg
+    join course c on c.id = cfg.course_id
+    where c.id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+      and cfg.final_score is not null
+  </select>
+
+  <resultMap id="TeacherStudentGradeItemMap" type="com.edu.classroom.dto.teacher.TeacherStudentGradeItem">
+    <result property="studentId" column="student_id"/>
+    <result property="studentName" column="student_name"/>
+    <result property="assignmentScore" column="assignment_score"/>
+    <result property="checkinScore" column="checkin_score"/>
+    <result property="resourceScore" column="resource_score"/>
+    <result property="examScore" column="exam_score"/>
+    <result property="finalScore" column="final_score"/>
+    <result property="calculatedAt" column="calculated_at"/>
+  </resultMap>
+
+  <select id="listStudentGradesForCourse" resultMap="TeacherStudentGradeItemMap">
+    select
+      u.id as student_id,
+      coalesce(nullif(trim(u.real_name), ''), u.username) as student_name,
+      cfg.assignment_score,
+      cfg.checkin_score,
+      cfg.resource_score,
+      cfg.exam_score,
+      cfg.final_score,
+      cfg.calculated_at
+    from course c
+    join course_member cm on cm.course_id = c.id
+      and cm.member_role = 'STUDENT'
+      and cm.status = 1
+    join sys_user u on u.id = cm.user_id and u.status = 1
+    left join course_final_grade cfg on cfg.course_id = c.id and cfg.student_id = u.id
+    where c.id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+    order by student_name asc, u.id asc
+  </select>
+</mapper>

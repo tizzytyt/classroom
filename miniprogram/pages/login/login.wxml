@@ -1,0 +1,35 @@
+<view class="page">
+  <view class="brand">
+    <view class="brandTitle">在线课堂</view>
+    <view class="brandSub">登录后进入课程学习与作业提交</view>
+  </view>
+
+  <view class="card loginCard">
+    <view class="formItem">
+      <view class="formLabel">身份</view>
+      <view class="roleSwitch">
+        <view class="roleItem {{selectedRole === 'STUDENT' ? 'active' : ''}}" bindtap="selectRole" data-role="STUDENT">学生</view>
+        <view class="roleItem {{selectedRole === 'TEACHER' ? 'active' : ''}}" bindtap="selectRole" data-role="TEACHER">教师</view>
+        <view class="roleItem {{selectedRole === 'ADMIN' ? 'active' : ''}}" bindtap="selectRole" data-role="ADMIN">管理员</view>
+      </view>
+    </view>
+
+    <view class="formItem">
+      <view class="formLabel">用户名</view>
+      <input class="input formInput" placeholder="请输入用户名" value="{{username}}" bindinput="onUsername" />
+    </view>
+
+    <view class="formItem">
+      <view class="formLabel">密码</view>
+      <input class="input formInput" placeholder="请输入密码" password="{{!showPassword}}" value="{{password}}" bindinput="onPassword" />
+    </view>
+
+    <view class="row tools">
+      <view class="link" bindtap="togglePassword">{{showPassword ? '隐藏密码' : '显示密码'}}</view>
+    </view>
+
+    <button class="btnPrimary loginBtn" loading="{{loading}}" disabled="{{loading}}" bindtap="submit">
+      {{loading ? '登录中...' : '登录'}}
+    </button>
+  </view>
+</view>

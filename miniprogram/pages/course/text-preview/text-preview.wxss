@@ -1,0 +1,20 @@
+page {
+  height: 100%;
+  background: #f7f8fa;
+}
+
+.wrap {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 24rpx 28rpx 48rpx;
+}
+
+.mono {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 26rpx;
+  line-height: 1.55;
+  color: #1a1a1a;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

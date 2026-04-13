@@ -1,0 +1,51 @@
+<view class="page">
+  <view class="card">
+    <view class="title">学生学习监控</view>
+    <view class="sub">右侧标签为「学习风险」。算法见下方说明。</view>
+    <view class="ruleBox">
+      <view class="ruleTitle">风险等级如何计算（后端）</view>
+      <view class="ruleLine">仅依据四项完成率：学习资源完成率、作业完成率、考试完成率、出勤率。</view>
+      <view class="ruleLine">最终得分 = 四项完成率平均值（0-100分）。</view>
+      <view class="ruleLine">最终得分低于 60 分判定为高风险，否则为低风险。</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view wx:if="{{loading}}" class="tip">加载中...</view>
+    <view wx:elif="{{!list.length}}" class="tip">暂无数据</view>
+    <block wx:else>
+      <view wx:for="{{list}}" wx:key="studentId" class="item">
+        <view class="rowTop">
+          <view class="name">{{item.studentName}}</view>
+          <view class="badge badge-{{item.riskLevel}}">{{item.riskLabel}}</view>
+        </view>
+        <view class="meta">资源完成率：{{item.resourceCompletionRatePercent}}%（{{item.completedResources}}/{{item.totalResources}}）</view>
+        <view class="meta">作业完成率：{{item.homeworkCompletionRatePercent}}%（{{item.submittedAssignments}}/{{item.totalAssignments}}）</view>
+        <view class="meta">考试完成率：{{item.examCompletionRatePercent}}%（{{item.completedExams}}/{{item.totalExams}}）</view>
+        <view class="meta">出勤率：{{item.attendanceRatePercent}}%（{{item.checkedInCount}}/{{item.totalCheckins}}）</view>
+        <view class="ops">
+          <button size="mini" class="miniBtn" data-id="{{item.studentId}}" data-name="{{item.studentName}}" bindtap="showRecommend">
+            查看推荐资源
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="mask" wx:if="{{showRec}}" bindtap="closeRec"></view>
+  <view class="modal" wx:if="{{showRec}}">
+    <view class="modalTitle">推荐资源 - {{recStudentName}}</view>
+    <view wx:if="{{recLoading}}" class="tip">加载中...</view>
+    <view wx:elif="{{!recList.length}}" class="tip">暂无推荐（可能已全部完成）</view>
+    <block wx:else>
+      <view wx:for="{{recList}}" wx:key="id" class="recItem">
+        <view class="recName">{{item.title}}</view>
+        <view class="recMeta">{{item.category}} · {{item.fileName}}</view>
+      </view>
+    </block>
+    <input class="reasonInput" placeholder="推送说明（可选）" value="{{pushReason}}" bindinput="onPushReasonInput" />
+    <button class="btnPush" loading="{{pushing}}" bindtap="pushRec">一键推送给该学生</button>
+    <button class="btnClose" bindtap="closeRec">关闭</button>
+  </view>
+</view>
+

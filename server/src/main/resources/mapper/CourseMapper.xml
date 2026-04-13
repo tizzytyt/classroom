@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.CourseMapper">
+  <resultMap id="CourseMap" type="com.edu.classroom.entity.Course">
+    <id property="id" column="id"/>
+    <result property="name" column="name"/>
+    <result property="courseCode" column="course_code"/>
+    <result property="intro" column="intro"/>
+    <result property="coverUrl" column="cover_url"/>
+    <result property="category" column="category"/>
+    <result property="teacherId" column="teacher_id"/>
+    <result property="status" column="status"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="deletedAt" column="deleted_at"/>
+  </resultMap>
+
+  <select id="listJoined" parameterType="long" resultMap="CourseMap">
+    select c.*
+    from course_member cm
+    join course c on cm.course_id = c.id
+    where cm.user_id = #{studentId}
+      and cm.member_role = 'STUDENT'
+      and cm.status = 1
+      and c.status = 1
+    order by c.created_at desc
+  </select>
+
+  <select id="listTeaching" parameterType="long" resultMap="CourseMap">
+    select *
+    from course
+    where teacher_id = #{teacherId}
+      and status = 1
+    order by created_at desc
+  </select>
+
+  <select id="findById" parameterType="long" resultMap="CourseMap">
+    select * from course where id = #{id} and status = 1
+  </select>
+
+  <select id="findByIdAndTeacher" resultMap="CourseMap">
+    select *
+    from course
+    where id = #{id}
+      and teacher_id = #{teacherId}
+      and status = 1
+  </select>
+
+  <select id="findByCode" parameterType="string" resultMap="CourseMap">
+    select * from course where course_code = #{code} and status = 1
+  </select>
+
+  <insert id="upsertMember">
+    insert into course_member(id, course_id, user_id, member_role, join_type, status)
+    values (UUID_SHORT(), #{courseId}, #{userId}, 'STUDENT', #{joinType}, 1)
+    on duplicate key update status = 1, join_type = values(join_type)
+  </insert>
+
+  <insert id="upsertTeacherMember">
+    insert into course_member(id, course_id, user_id, member_role, join_type, status)
+    values (UUID_SHORT(), #{courseId}, #{teacherId}, 'TEACHER', 'CREATE', 1)
+    on duplicate key update status = 1
+  </insert>
+
+  <insert id="insertCourse" parameterType="com.edu.classroom.entity.Course" useGeneratedKeys="false">
+    insert into course(
+      id, name, course_code, intro, cover_url, category, teacher_id, status
+    ) values (
+      UUID_SHORT(), #{name}, #{courseCode}, #{intro}, #{coverUrl}, #{category}, #{teacherId}, 1
+    )
+  </insert>
+
+  <update id="updateCourseByTeacher" parameterType="com.edu.classroom.entity.Course">
+    update course
+    set name = #{name},
+        intro = #{intro},
+        category = #{category},
+        cover_url = #{coverUrl}
+    where id = #{id}
+      and teacher_id = #{teacherId}
+      and status = 1
+  </update>
+
+  <update id="softDeleteByTeacher">
+    update course
+    set status = 0,
+        deleted_at = now()
+    where id = #{id}
+      and teacher_id = #{teacherId}
+      and status = 1
+  </update>
+</mapper>

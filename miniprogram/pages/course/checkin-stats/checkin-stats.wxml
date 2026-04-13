@@ -1,0 +1,39 @@
+<view class="page">
+  <view class="card">
+    <view class="title">出勤统计</view>
+    <view class="tip" wx:if="{{loading}}">加载中...</view>
+    <view class="tip" wx:elif="{{errorText}}">{{errorText}}</view>
+
+    <block wx:elif="{{!loading}}">
+      <view class="grid">
+        <view class="stat">
+          <view class="statLabel">应到人数</view>
+          <view class="statValue">{{shouldAttend}}</view>
+        </view>
+        <view class="stat">
+          <view class="statLabel">实到人数</view>
+          <view class="statValue">{{attended}}</view>
+        </view>
+        <view class="stat">
+          <view class="statLabel">出勤率</view>
+          <view class="statValue">{{attendanceRateText}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="title">缺勤学生名单</view>
+    <view class="tip" wx:if="{{loading}}">加载中...</view>
+    <view class="tip" wx:elif="{{!absentList.length}}">无缺勤</view>
+    <block wx:else>
+      <view wx:for="{{absentList}}" wx:key="studentId" class="row">
+        <view class="name">{{item.studentName || item.name || '—'}}</view>
+        <view class="sub" wx:if="{{item.studentNo || item.username}}">
+          {{item.studentNo || item.username}}
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+

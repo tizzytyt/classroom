@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="card filterCard">
+    <view class="filterRow">
+      <input class="input searchInput" placeholder="搜索用户名/姓名" value="{{keyword}}" bindinput="onKeyword" confirm-type="search" bindconfirm="doSearch" />
+      <button class="btnPrimary smallBtn" bindtap="doSearch">搜索</button>
+    </view>
+    <view class="filterRow">
+      <picker mode="selector" range="{{roleOptions}}" value="{{roleIndex}}" bindchange="onRoleChange">
+        <view class="picker">{{roleOptions[roleIndex]}}</view>
+      </picker>
+      <picker mode="selector" range="{{statusOptions}}" value="{{statusIndex}}" bindchange="onStatusChange">
+        <view class="picker">{{statusOptions[statusIndex]}}</view>
+      </picker>
+      <button class="btnPrimary smallBtn ghost" bindtap="resetFilter">重置</button>
+    </view>
+    <button class="btnPrimary addBtn" bindtap="goCreate">新增用户</button>
+  </view>
+
+  <view wx:if="{{loading && items.length === 0}}" class="hint">加载中...</view>
+  <view wx:elif="{{items.length === 0}}" class="hint">暂无数据</view>
+
+  <block wx:else>
+    <view wx:for="{{items}}" wx:key="id" class="card userCard" bindtap="openActions" data-id="{{item.id}}">
+      <view class="userTop">
+        <view class="userName">{{item.realName || '-'}}</view>
+        <view class="tag {{item.isDeleted ? 'tagDel' : (item.status === 1 ? 'tagOk' : 'tagOff')}}">{{item.isDeleted ? '删除' : (item.status === 1 ? '启用' : '禁用')}}</view>
+      </view>
+      <view class="userSub">{{item.username}} · {{item.roleName}}</view>
+      <view class="userMeta">{{item.phone || ''}} {{item.email ? ('· ' + item.email) : ''}}</view>
+    </view>
+  </block>
+
+  <view class="footer">
+    <view wx:if="{{loading && items.length > 0}}" class="hint">加载中...</view>
+    <view wx:elif="{{!hasMore && items.length > 0}}" class="hint">没有更多了</view>
+  </view>
+</view>

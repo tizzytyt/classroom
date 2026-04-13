@@ -1,0 +1,132 @@
+.page {
+  padding-bottom: 24rpx;
+}
+
+.filterCard {
+  margin: 24rpx;
+}
+
+.filterRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.filterRow > view,
+.filterRow > input,
+.filterRow > button,
+.filterRow > picker {
+  margin-right: 16rpx;
+}
+
+.filterRow > view:last-child,
+.filterRow > input:last-child,
+.filterRow > button:last-child,
+.filterRow > picker:last-child {
+  margin-right: 0;
+}
+
+.searchInput {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.smallBtn {
+  height: 72rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.ghost {
+  background: rgba(0, 122, 255, 0.12);
+  color: #007aff;
+}
+
+.picker {
+  height: 72rpx;
+  padding: 0 18rpx;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  color: rgba(17, 17, 17, 0.75);
+  background: #fff;
+}
+
+.addBtn {
+  width: 100%;
+  height: 80rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.userCard {
+  margin: 18rpx 24rpx;
+}
+
+.userTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.userName {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #111;
+}
+
+.tag {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+}
+
+.tagOk {
+  background: rgba(52, 199, 89, 0.12);
+  color: #1a7f37;
+}
+
+.tagOff {
+  background: rgba(255, 59, 48, 0.10);
+  color: #b42318;
+}
+
+.tagDel {
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(17, 17, 17, 0.65);
+}
+
+.userSub {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: rgba(17, 17, 17, 0.65);
+}
+
+.userMeta {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: rgba(17, 17, 17, 0.45);
+}
+
+.hint {
+  margin: 24rpx;
+  text-align: center;
+  color: rgba(17, 17, 17, 0.45);
+  font-size: 26rpx;
+}
+
+.footer {
+  height: 64rpx;
+}

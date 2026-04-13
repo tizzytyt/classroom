@@ -1,0 +1,64 @@
+<view class="page">
+  <view class="header">
+    <view class="hello">你好，</view>
+    <view class="name">{{displayName}}</view>
+    <view class="roleTag">
+      {{user && user.roleCode === 'STUDENT' ? '学生' : (user && user.roleCode === 'TEACHER' ? '教师' : '用户')}}
+    </view>
+    <view class="sub">欢迎来到在线课堂，开始你的学习之旅</view>
+  </view>
+
+  <view class="content">
+    <view class="card" wx:if="{{user && user.roleCode !== 'TEACHER'}}">
+      <view class="sectionTitle">加入新课程</view>
+      <view class="sectionSub">通过课程码快速加入老师创建的课堂</view>
+      <view class="joinRow">
+        <input class="input" placeholder="请输入课程码" value="{{joinCode}}" bindinput="onJoinCodeInput" />
+        <button class="btnPrimary" size="mini" bindtap="joinByCode">加入</button>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{user && user.roleCode === 'TEACHER'}}">
+      <view class="sectionTitle">创建课程</view>
+      <view class="sectionSub">填写课程信息后可生成课程码，学生可通过课程码加入。</view>
+      <view class="sectionSub weightHint">总评占比（四项为百分数，须合计 100；不填则默认 70 / 20 / 10 / 0，最后一项为考试）。</view>
+      <view class="joinRow">
+        <input class="input" placeholder="课程名称" value="{{createForm.name}}" bindinput="onCreateNameInput" />
+        <input class="input inputTop" placeholder="课程简介（选填）" value="{{createForm.intro}}" bindinput="onCreateIntroInput" />
+        <view class="weightLabelRow">
+          <view class="weightLabel">作业</view>
+          <view class="weightLabel">签到</view>
+          <view class="weightLabel">学习资源</view>
+          <view class="weightLabel">考试</view>
+        </view>
+        <view class="weightRow">
+          <input class="input inputTop weightInput" type="digit" placeholder="作业%" value="{{createForm.assignmentPct}}" bindinput="onCreateAssignPctInput" />
+          <input class="input inputTop weightInput" type="digit" placeholder="签到%" value="{{createForm.checkinPct}}" bindinput="onCreateCheckinPctInput" />
+          <input class="input inputTop weightInput" type="digit" placeholder="资源%" value="{{createForm.resourcePct}}" bindinput="onCreateResourcePctInput" />
+          <input class="input inputTop weightInput" type="digit" placeholder="考试%" value="{{createForm.examPct}}" bindinput="onCreateExamPctInput" />
+        </view>
+        <button class="btnPrimary" size="mini" loading="{{creatingCourse}}" bindtap="createCourse">创建课程</button>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="sectionTitle">{{user && user.roleCode === 'TEACHER' ? '我的授课课程' : '我的课程'}}</view>
+      <view class="sectionSub">{{user && user.roleCode === 'TEACHER' ? '点击进入课程进行教学管理' : '点击进入课程，可查看资源、作业和成绩'}}</view>
+      <view wx:if="{{loadingCourses}}" class="tip">课程加载中...</view>
+      <view wx:elif="{{courses.length === 0}}" class="tip">{{user && user.roleCode === 'TEACHER' ? '你还没有创建任何课程，先创建一个吧~' : '你还没有加入任何课程，先通过课程码加入一个吧~'}}</view>
+      <block wx:else>
+        <view wx:for="{{courses}}" wx:key="id" class="courseItem" data-id="{{item.id}}" bindtap="goCourse">
+          <view class="courseMain">
+            <view class="courseName">{{item.name}}</view>
+            <view class="courseIntro">{{item.intro || (user && user.roleCode === 'TEACHER' ? ('课程码：' + item.courseCode) : '暂无课程简介')}}</view>
+          </view>
+          <view class="courseArrow">›</view>
+        </view>
+      </block>
+    </view>
+
+    <view class="card logoutCard">
+      <button class="btnDanger" bindtap="doLogout">退出登录</button>
+    </view>
+  </view>
+</view>

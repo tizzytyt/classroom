@@ -1,0 +1,43 @@
+.page {
+  padding: 24rpx;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.meta {
+  font-size: 26rpx;
+  color: #666666;
+  margin-top: 6rpx;
+}
+
+.tip {
+  font-size: 24rpx;
+  color: #888888;
+  margin-bottom: 16rpx;
+}
+
+.item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.name {
+  font-size: 28rpx;
+  font-weight: 500;
+}

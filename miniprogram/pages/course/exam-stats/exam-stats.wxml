@@ -1,0 +1,86 @@
+<view class="page">
+  <view class="card" wx:if="{{paperTitle}}">
+    <view class="title">{{paperTitle}}</view>
+    <view class="tip">统计口径：以“已提交答卷”为参加考试。</view>
+  </view>
+
+  <view class="card">
+    <view class="sectionTitle">概览</view>
+    <view wx:if="{{loading}}" class="tip">加载中...</view>
+    <block wx:else>
+      <view class="meta">课程学生：{{totalStudents}} 人</view>
+      <view class="meta">已参加（已提交）：{{joinedCount}} 人</view>
+      <view class="meta">未参加：{{notJoinedCount}} 人</view>
+      <view class="meta strong">参与率：{{participationRate}}%</view>
+      <view class="progressTrack">
+        <view class="progressFill" style="width: {{participationRate}}%;"></view>
+      </view>
+      <view class="divider"></view>
+      <view class="meta">平均分：{{scoreAvg != null ? scoreAvg : '—'}}</view>
+      <view class="meta">最高分：{{scoreMax != null ? scoreMax : '—'}}</view>
+      <view class="meta">最低分：{{scoreMin != null ? scoreMin : '—'}}</view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="sectionTitle">成绩分布（按已参加 {{joinedCount}} 人统计）</view>
+    <view wx:if="{{joinedCount === 0}}" class="tip">暂无成绩数据</view>
+    <block wx:else>
+      <view class="distRow">
+        <view class="distLeft">{{dist.excellent.label}}</view>
+        <view class="distRight">{{dist.excellent.count}} 人 · {{dist.excellent.percent}}%</view>
+      </view>
+      <view class="barTrack">
+        <view class="barFill barEx" style="width: {{dist.excellent.percent}}%;"></view>
+      </view>
+
+      <view class="distRow">
+        <view class="distLeft">{{dist.good.label}}</view>
+        <view class="distRight">{{dist.good.count}} 人 · {{dist.good.percent}}%</view>
+      </view>
+      <view class="barTrack">
+        <view class="barFill barGood" style="width: {{dist.good.percent}}%;"></view>
+      </view>
+
+      <view class="distRow">
+        <view class="distLeft">{{dist.pass.label}}</view>
+        <view class="distRight">{{dist.pass.count}} 人 · {{dist.pass.percent}}%</view>
+      </view>
+      <view class="barTrack">
+        <view class="barFill barPass" style="width: {{dist.pass.percent}}%;"></view>
+      </view>
+
+      <view class="distRow">
+        <view class="distLeft">{{dist.fail.label}}</view>
+        <view class="distRight">{{dist.fail.count}} 人 · {{dist.fail.percent}}%</view>
+      </view>
+      <view class="barTrack">
+        <view class="barFill barFail" style="width: {{dist.fail.percent}}%;"></view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="sectionTitle">已参加（{{joinedCount}}）</view>
+    <view wx:if="{{!joinedList.length}}" class="tip">暂无已提交答卷</view>
+    <block wx:else>
+      <view wx:for="{{joinedList}}" wx:key="attemptId" class="item">
+        <view class="name">{{item.studentName}}</view>
+        <view class="meta">提交时间：{{item.submittedAt || '—'}}</view>
+        <view class="meta">得分：{{item.totalScore != null ? item.totalScore : '—'}}</view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="sectionTitle">未参加（{{notJoinedCount}}）</view>
+    <view wx:if="{{!notJoinedList.length}}" class="tip">暂无未参加学生</view>
+    <block wx:else>
+      <view wx:for="{{notJoinedList}}" wx:key="id" class="item">
+        <view class="name">{{item.realName || item.username}}</view>
+        <view class="meta">学号/账号：{{item.username}}</view>
+      </view>
+    </block>
+  </view>
+</view>
+

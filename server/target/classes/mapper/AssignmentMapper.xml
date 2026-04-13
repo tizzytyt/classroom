@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.AssignmentMapper">
+  <resultMap id="AssignmentMap" type="com.edu.classroom.entity.Assignment">
+    <id property="id" column="id"/>
+    <result property="courseId" column="course_id"/>
+    <result property="title" column="title"/>
+    <result property="content" column="content"/>
+    <result property="dueAt" column="due_at"/>
+    <result property="totalScore" column="total_score"/>
+    <result property="creatorId" column="creator_id"/>
+    <result property="attachmentUrl" column="attachment_url"/>
+    <result property="publishedAt" column="published_at"/>
+    <result property="status" column="status"/>
+  </resultMap>
+
+  <resultMap id="SubmissionMap" type="com.edu.classroom.entity.AssignmentSubmission">
+    <id property="id" column="id"/>
+    <result property="assignmentId" column="assignment_id"/>
+    <result property="studentId" column="student_id"/>
+    <result property="submitText" column="submit_text"/>
+    <result property="attachmentUrls" column="attachment_urls"/>
+    <result property="submittedAt" column="submitted_at"/>
+    <result property="submitStatus" column="submit_status"/>
+    <result property="isLate" column="is_late"/>
+    <result property="version" column="version"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <resultMap id="GradeMap" type="com.edu.classroom.entity.AssignmentGrade">
+    <id property="id" column="id"/>
+    <result property="submissionId" column="submission_id"/>
+    <result property="teacherId" column="teacher_id"/>
+    <result property="score" column="score"/>
+    <result property="comment" column="comment"/>
+    <result property="gradedAt" column="graded_at"/>
+  </resultMap>
+
+  <select id="listByCourse" parameterType="long" resultMap="AssignmentMap">
+    select * from assignment
+    where course_id = #{courseId} and status = 1
+    order by published_at desc
+  </select>
+
+  <resultMap id="AssignmentStudentListMap" type="com.edu.classroom.entity.Assignment" extends="AssignmentMap">
+    <result property="myScore" column="my_score"/>
+  </resultMap>
+
+  <select id="listByCourseForStudent" resultMap="AssignmentStudentListMap">
+    select
+      a.*,
+      g.score as my_score
+    from assignment a
+    left join assignment_submission s
+      on s.assignment_id = a.id and s.student_id = #{studentId}
+    left join assignment_grade g on g.submission_id = s.id
+    where a.course_id = #{courseId} and a.status = 1
+    order by a.published_at desc
+  </select>
+
+  <select id="listByCourseAndTeacher" parameterType="long" resultMap="AssignmentMap">
+    select a.*
+    from assignment a
+    join course c on c.id = a.course_id
+    where a.course_id = #{courseId}
+      and a.status = 1
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+    order by a.published_at desc
+  </select>
+
+  <select id="findById" parameterType="long" resultMap="AssignmentMap">
+    select * from assignment where id = #{id} and status = 1
+  </select>
+
+  <select id="findByIdAndTeacher" resultMap="AssignmentMap">
+    select a.*
+    from assignment a
+    join course c on c.id = a.course_id
+    where a.id = #{id}
+      and a.status = 1
+      and a.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+    limit 1
+  </select>
+
+  <insert id="insertAssignment">
+    insert into assignment(
+      id, course_id, title, content, due_at, total_score, creator_id, attachment_url, published_at, status
+    ) values (
+      UUID_SHORT(),
+      #{courseId},
+      #{title},
+      #{content},
+      #{dueAt},
+      #{totalScore},
+      #{creatorId},
+      #{attachmentUrl},
+      now(),
+      1
+    )
+  </insert>
+
+  <select id="findSubmission" resultMap="SubmissionMap">
+    select * from assignment_submission
+    where assignment_id = #{assignmentId} and student_id = #{studentId}
+    limit 1
+  </select>
+
+  <insert id="upsertSubmissionText">
+    insert into assignment_submission(id, assignment_id, student_id, submit_text, attachment_urls, submitted_at, submit_status, is_late, version, updated_at)
+    values (UUID_SHORT(), #{assignmentId}, #{studentId}, #{text}, #{attachmentUrls}, now(), 'SUBMITTED', #{isLate}, 1, now())
+    on duplicate key update submit_text = values(submit_text), attachment_urls = values(attachment_urls), submitted_at = values(submitted_at), submit_status = values(submit_status), is_late = values(is_late), version = version + 1, updated_at = values(updated_at)
+  </insert>
+
+  <select id="findGradeBySubmission" parameterType="long" resultMap="GradeMap">
+    select * from assignment_grade where submission_id = #{submissionId}
+    limit 1
+  </select>
+
+  <resultMap id="SubmissionGradeDtoMap" type="com.edu.classroom.dto.teacher.AssignmentSubmissionGradeDto">
+    <id property="submissionId" column="submission_id"/>
+    <result property="assignmentId" column="assignment_id"/>
+    <result property="studentId" column="student_id"/>
+    <result property="studentName" column="student_name"/>
+    <result property="submitText" column="submit_text"/>
+    <result property="attachmentUrls" column="attachment_urls"/>
+    <result property="submittedAt" column="submitted_at"/>
+    <result property="submitStatus" column="submit_status"/>
+    <result property="isLate" column="is_late"/>
+    <result property="gradeScore" column="score"/>
+    <result property="gradeComment" column="comment"/>
+    <result property="gradedAt" column="graded_at"/>
+  </resultMap>
+
+  <resultMap id="HomeworkCompletionStatsMap" type="com.edu.classroom.dto.teacher.HomeworkCompletionStatsResponse">
+    <result property="homeworkId" column="homework_id"/>
+    <result property="title" column="homework_title"/>
+    <result property="publishTime" column="publish_time"/>
+    <result property="deadline" column="deadline"/>
+    <result property="submitCount" column="submit_count"/>
+    <result property="studentCount" column="student_count"/>
+    <result property="completionRate" column="completion_rate"/>
+  </resultMap>
+
+  <select id="listSubmissionsForTeacher" resultMap="SubmissionGradeDtoMap">
+    select
+      s.id as submission_id,
+      s.assignment_id,
+      s.student_id,
+      concat(u.real_name, '(', u.username, ')') as student_name,
+      s.submit_text,
+      s.attachment_urls,
+      s.submitted_at,
+      s.submit_status,
+      s.is_late,
+      g.score,
+      g.comment,
+      g.graded_at
+    from assignment_submission s
+    join assignment a on a.id = s.assignment_id
+    join course c on c.id = a.course_id
+    join sys_user u on u.id = s.student_id
+    left join assignment_grade g on g.submission_id = s.id
+    where a.id = #{assignmentId}
+      and c.id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+      and a.status = 1
+      and s.submit_status = 'SUBMITTED'
+    order by s.submitted_at desc
+  </select>
+
+  <select id="listHomeworkCompletionStats" resultMap="HomeworkCompletionStatsMap">
+    select
+      a.id as homework_id,
+      a.title as homework_title,
+      a.published_at as publish_time,
+      a.due_at as deadline,
+      ifnull(sub.submit_count, 0) as submit_count,
+      stu.student_count as student_count,
+      case
+        when stu.student_count = 0 then 0
+        else ifnull(sub.submit_count, 0) / stu.student_count
+      end as completion_rate
+    from assignment a
+    join course c on c.id = a.course_id
+    cross join (
+      select count(1) as student_count
+      from course_member cm
+      join sys_user u on u.id = cm.user_id
+      where cm.course_id = #{courseId}
+        and cm.member_role = 'STUDENT'
+        and cm.status = 1
+        and u.status = 1
+    ) stu
+    left join (
+      select
+        s.assignment_id,
+        count(distinct s.student_id) as submit_count
+      from assignment_submission s
+      where s.submit_status = 'SUBMITTED'
+      group by s.assignment_id
+    ) sub on sub.assignment_id = a.id
+    where a.course_id = #{courseId}
+      and a.status = 1
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+    order by a.published_at desc
+  </select>
+
+  <select id="listAssignmentScoresForTeacher" resultType="double">
+    select g.score
+    from assignment_grade g
+    join assignment_submission s on s.id = g.submission_id
+    join assignment a on a.id = s.assignment_id
+    join course c on c.id = a.course_id
+    where c.teacher_id = #{teacherId}
+      and c.id = #{courseId}
+      and a.id = #{homeworkId}
+      and c.status = 1
+      and a.status = 1
+      and s.submit_status = 'SUBMITTED'
+      and g.score is not null
+  </select>
+
+  <insert id="insertGradeByTeacher">
+    insert into assignment_grade(id, submission_id, teacher_id, score, comment, graded_at)
+    select
+      UUID_SHORT(),
+      s.id,
+      #{teacherId},
+      #{score},
+      #{comment},
+      now()
+    from assignment_submission s
+    join assignment a on a.id = s.assignment_id
+    join course c on c.id = a.course_id
+    where s.id = #{submissionId}
+      and a.id = #{assignmentId}
+      and c.id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+      and a.status = 1
+      and s.submit_status = 'SUBMITTED'
+  </insert>
+
+  <select id="countAssignmentsByCourse" parameterType="long" resultType="int">
+    select count(*) from assignment
+    where course_id = #{courseId} and status = 1
+  </select>
+
+  <select id="countDistinctSubmitStudentsByCourse" parameterType="long" resultType="int">
+    select count(distinct s.student_id)
+    from assignment_submission s
+    join assignment a on a.id = s.assignment_id
+    where a.course_id = #{courseId}
+      and a.status = 1
+      and s.submit_status = 'SUBMITTED'
+  </select>
+
+  <select id="countDistinctSubmitStudentsByHomework" parameterType="long" resultType="int">
+    select count(distinct student_id)
+    from assignment_submission
+    where assignment_id = #{homeworkId}
+      and submit_status = 'SUBMITTED'
+  </select>
+
+  <select id="countSubmittedAssignmentsByCourseAndStudent" resultType="int">
+    select count(distinct s.assignment_id)
+    from assignment_submission s
+    join assignment a on a.id = s.assignment_id
+    where a.course_id = #{courseId}
+      and a.status = 1
+      and s.student_id = #{studentId}
+      and s.submit_status = 'SUBMITTED'
+  </select>
+</mapper>

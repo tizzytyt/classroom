@@ -1,0 +1,66 @@
+<view class="page">
+  <view class="card" wx:if="{{detail}}">
+    <view class="title">{{detail.title}}</view>
+    <view class="meta">进度：第 {{index + 1}} / {{total}} 题</view>
+  </view>
+
+  <view class="card" wx:if="{{q}}">
+    <view class="qStem">{{index + 1}}. {{q.stem}}</view>
+    <view class="qMeta">{{q.typeLabel}} · {{q.score}} 分</view>
+
+    <block wx:if="{{q.qType === 1 && q.options && q.options.length}}">
+      <radio-group bindchange="onSingleChange">
+        <label class="optLine" wx:for="{{q.options}}" wx:for-item="op" wx:key="key">
+          <radio value="{{op.key}}" checked="{{answerSingleKey === op.key}}" />
+          <text>{{op.key}}. {{op.text}}</text>
+        </label>
+      </radio-group>
+    </block>
+
+    <block wx:elif="{{q.qType === 2 && q.options && q.options.length}}">
+      <checkbox-group bindchange="onMultiChange">
+        <label class="optLine" wx:for="{{q.options}}" wx:for-item="op" wx:key="key">
+          <checkbox value="{{op.key}}" checked="{{answerMultiKeys.indexOf(op.key) !== -1}}" />
+          <text>{{op.key}}. {{op.text}}</text>
+        </label>
+      </checkbox-group>
+      <view class="tip">已选：{{answerMultiKeys.length ? answerMultiKeys.join(',') : '—'}}</view>
+    </block>
+
+    <block wx:elif="{{q.qType === 3}}">
+      <radio-group bindchange="onTfChange">
+        <label class="optLine">
+          <radio value="T" checked="{{answerTfKey !== 'F'}}" />
+          <text>正确</text>
+        </label>
+        <label class="optLine">
+          <radio value="F" checked="{{answerTfKey === 'F'}}" />
+          <text>错误</text>
+        </label>
+      </radio-group>
+    </block>
+
+    <block wx:elif="{{q.qType === 4}}">
+      <input class="input" placeholder="填空题答案" value="{{answerText}}" bindinput="onTextInput" />
+    </block>
+
+    <block wx:elif="{{q.qType === 5}}">
+      <textarea class="textarea" placeholder="简答题" value="{{answerText}}" bindinput="onTextInput" />
+    </block>
+
+    <block wx:else>
+      <textarea class="textarea" placeholder="作答内容" value="{{answerText}}" bindinput="onTextInput" />
+      <view class="tip">提示：该题型为扩展题型，已按文本作答提交。</view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="btnRow">
+      <button class="btnGhost" disabled="{{index <= 0}}" bindtap="prevQ">上一题</button>
+      <button wx:if="{{index < total - 1}}" class="btnPrimary" bindtap="nextQ">下一题</button>
+      <button wx:else class="btnPrimary" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitPaper">提交试卷</button>
+    </view>
+    <view class="tip">提示：切换题目会自动保存当前答案。</view>
+  </view>
+</view>
+

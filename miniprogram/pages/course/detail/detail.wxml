@@ -1,0 +1,51 @@
+<view class="page">
+  <view class="card" wx:if="{{course}}">
+    <view class="title">{{course.name}}</view>
+    <view class="sub">课程代码：{{course.courseCode}}</view>
+    <view class="sub">{{course.intro || '暂无课程简介'}}</view>
+    <view class="sub">类别：{{course.category || '未分类'}}</view>
+    <view class="sub" wx:if="{{isTeacher && course.gradeAssignmentWeight != null}}">总评占比：作业 {{courseGradeAssignPct}}% · 签到 {{courseGradeCheckinPct}}% · 资源 {{courseGradeResourcePct}}% · 考试 {{courseGradeExamPct}}%</view>
+    <view class="teacherOps" wx:if="{{isTeacher}}">
+      <button class="btnSmall" bindtap="toggleEdit">{{editing ? '取消编辑' : '编辑课程信息'}}</button>
+      <button class="btnSmall" bindtap="goMembers">学生列表</button>
+      <button class="btnDangerSmall" bindtap="deleteCourse">删除课程</button>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{isTeacher && editing}}">
+    <view class="sectionTitle">编辑课程信息</view>
+    <input class="input" placeholder="课程名称" value="{{editForm.name}}" bindinput="onEditNameInput" />
+    <input class="input inputTop" placeholder="课程简介（选填）" value="{{editForm.intro}}" bindinput="onEditIntroInput" />
+    <input class="input inputTop" placeholder="课程类别（选填）" value="{{editForm.category}}" bindinput="onEditCategoryInput" />
+    <view class="sectionSub">总评占比（百分数，合计 100）</view>
+    <view class="weightLabelRow">
+      <view class="weightLabel">作业</view>
+      <view class="weightLabel">签到</view>
+      <view class="weightLabel">学习资源</view>
+      <view class="weightLabel">考试</view>
+    </view>
+    <view class="weightRow">
+      <input class="input inputTop weightInput" type="digit" placeholder="作业%" value="{{editForm.assignmentPct}}" bindinput="onEditAssignPctInput" />
+      <input class="input inputTop weightInput" type="digit" placeholder="签到%" value="{{editForm.checkinPct}}" bindinput="onEditCheckinPctInput" />
+      <input class="input inputTop weightInput" type="digit" placeholder="资源%" value="{{editForm.resourcePct}}" bindinput="onEditResourcePctInput" />
+      <input class="input inputTop weightInput" type="digit" placeholder="考试%" value="{{editForm.examPct}}" bindinput="onEditExamPctInput" />
+    </view>
+    <button class="btn" loading="{{saving}}" bindtap="saveCourse">保存修改</button>
+  </view>
+
+  <view class="card">
+    <view class="sectionTitle">学习入口</view>
+    <button class="btn" bindtap="goResources">学习资源</button>
+    <button class="btn" bindtap="goExams">{{isTeacher ? '试卷与考试' : '课程考试'}}</button>
+    <button class="btn" bindtap="goAssignments">作业列表</button>
+    <button class="btn" bindtap="goGrade">成绩与进度</button>
+    <button class="btn" bindtap="goCheckin">课堂签到</button>
+    <button class="btn" wx:if="{{isTeacher}}" bindtap="goMonitor">学习监控与推荐</button>
+    <button class="btn" wx:if="{{!isTeacher}}" bindtap="goRecommendations">我的推荐资源</button>
+    <view class="finalScoreRow" wx:if="{{!isTeacher}}">
+      <text class="finalScoreLabel">最终得分：</text>
+      <text class="finalScoreValue">{{finalScoreText || '教师未评分'}}</text>
+    </view>
+  </view>
+</view>
+

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.SysUserMapper">
+  <resultMap id="SysUserMap" type="com.edu.classroom.entity.SysUser">
+    <id property="id" column="id"/>
+    <result property="username" column="username"/>
+    <result property="passwordHash" column="password_hash"/>
+    <result property="realName" column="real_name"/>
+    <result property="roleCode" column="role_code"/>
+    <result property="phone" column="phone"/>
+    <result property="email" column="email"/>
+    <result property="avatarUrl" column="avatar_url"/>
+    <result property="status" column="status"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <select id="findByUsername" parameterType="string" resultMap="SysUserMap">
+    select id, username, password_hash, real_name, role_code, phone, email, avatar_url, status, created_at, updated_at
+    from sys_user
+    where username = #{username}
+    limit 1
+  </select>
+
+  <select id="findById" parameterType="long" resultMap="SysUserMap">
+    select id, username, password_hash, real_name, role_code, phone, email, avatar_url, status, created_at, updated_at
+    from sys_user
+    where id = #{id}
+    limit 1
+  </select>
+
+  <sql id="UserWhere">
+    <where>
+      <if test="keyword != null and keyword != ''">
+        and (username like concat('%', #{keyword}, '%') or real_name like concat('%', #{keyword}, '%'))
+      </if>
+      <if test="roleCode != null and roleCode != ''">
+        and role_code = #{roleCode}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+    </where>
+  </sql>
+
+  <select id="list" resultMap="SysUserMap">
+    select id, username, password_hash, real_name, role_code, phone, email, avatar_url, status, created_at, updated_at
+    from sys_user
+    <include refid="UserWhere"/>
+    order by id desc
+    limit #{size} offset #{offset}
+  </select>
+
+  <select id="count" resultType="long">
+    select count(1)
+    from sys_user
+    <include refid="UserWhere"/>
+  </select>
+
+  <select id="generateId" resultType="long">
+    select UUID_SHORT()
+  </select>
+
+  <insert id="insert" parameterType="com.edu.classroom.entity.SysUser">
+    insert into sys_user (id, username, password_hash, real_name, role_code, phone, email, avatar_url, status, created_at, updated_at)
+    values (#{id}, #{username}, #{passwordHash}, #{realName}, #{roleCode}, #{phone}, #{email}, #{avatarUrl}, #{status}, now(), now())
+  </insert>
+
+  <update id="updateProfile" parameterType="com.edu.classroom.entity.SysUser">
+    update sys_user
+    set real_name = #{realName},
+        phone = #{phone},
+        email = #{email},
+        avatar_url = #{avatarUrl},
+        updated_at = now()
+    where id = #{id}
+  </update>
+
+  <update id="updateRole">
+    update sys_user
+    set role_code = #{roleCode}, updated_at = now()
+    where id = #{id}
+  </update>
+
+  <update id="updateStatus">
+    update sys_user
+    set status = #{status}, updated_at = now()
+    where id = #{id}
+  </update>
+
+  <update id="updatePasswordHash">
+    update sys_user
+    set password_hash = #{passwordHash}, updated_at = now()
+    where id = #{id}
+  </update>
+
+  <update id="softDelete">
+    update sys_user
+    set status = 0,
+        username = concat(username, '_deleted_', id),
+        updated_at = now()
+    where id = #{id}
+  </update>
+</mapper>

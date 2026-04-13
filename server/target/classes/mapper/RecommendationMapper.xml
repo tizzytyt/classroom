@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.RecommendationMapper">
+  <resultMap id="StudentRecMap" type="com.edu.classroom.dto.student.StudentRecommendationDto">
+    <id property="pushId" column="push_id"/>
+    <result property="resourceId" column="resource_id"/>
+    <result property="title" column="title"/>
+    <result property="category" column="category"/>
+    <result property="fileUrl" column="file_url"/>
+    <result property="fileName" column="file_name"/>
+    <result property="fileType" column="file_type"/>
+    <result property="reason" column="reason"/>
+    <result property="status" column="status"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <insert id="insertPush">
+    insert into recommendation_push(
+      id, teacher_id, course_id, student_id, resource_id, reason, status, created_at
+    ) values (
+      UUID_SHORT(), #{teacherId}, #{courseId}, #{studentId}, #{resourceId}, #{reason}, 0, now()
+    )
+  </insert>
+
+  <select id="listByStudentAndCourse" resultMap="StudentRecMap">
+    select
+      rp.id as push_id,
+      cr.id as resource_id,
+      cr.title,
+      cr.category,
+      cr.file_url,
+      cr.file_name,
+      cr.file_type,
+      rp.reason,
+      rp.status,
+      rp.created_at
+    from recommendation_push rp
+    join course_resource cr on cr.id = rp.resource_id
+    where rp.student_id = #{studentId}
+      and rp.course_id = #{courseId}
+      and cr.status = 1
+    order by rp.created_at desc
+  </select>
+
+  <update id="markRead">
+    update recommendation_push
+    set status = 1,
+        read_at = now()
+    where id = #{pushId}
+      and student_id = #{studentId}
+  </update>
+</mapper>
+

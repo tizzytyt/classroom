@@ -1,0 +1,15 @@
+.page { padding: 24rpx; }
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.04);
+}
+.title { font-size: 30rpx; font-weight: 600; margin-bottom: 8rpx; }
+.sub, .tip, .meta { font-size: 24rpx; color: #666; }
+.item { padding: 16rpx 0; border-top: 1px solid #f5f5f5; }
+.name { font-size: 28rpx; }
+.ops { margin-top: 10rpx; }
+.miniBtn { margin: 0; }
+

@@ -1,0 +1,83 @@
+.page {
+  padding: 80rpx 24rpx 24rpx;
+}
+
+.brand {
+  padding: 0 12rpx;
+  margin-bottom: 28rpx;
+}
+
+.brandTitle {
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  color: #111;
+}
+
+.brandSub {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: rgba(17, 17, 17, 0.55);
+}
+
+.loginCard {
+  margin: 0;
+  padding: 32rpx 28rpx;
+  box-shadow: 0 16rpx 40rpx rgba(0, 0, 0, 0.08);
+}
+
+.formItem {
+  margin-bottom: 18rpx;
+}
+
+.formLabel {
+  font-size: 26rpx;
+  color: rgba(17, 17, 17, 0.65);
+  margin-bottom: 10rpx;
+}
+
+.formInput {
+  margin-bottom: 0;
+  background: #fff;
+}
+
+.roleSwitch {
+  display: flex;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 8rpx;
+  border-radius: 16rpx;
+}
+
+.roleItem {
+  flex: 1;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: rgba(17, 17, 17, 0.65);
+  border-radius: 12rpx;
+}
+
+.roleItem.active {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.tools {
+  margin-top: 18rpx;
+  margin-bottom: 22rpx;
+  justify-content: flex-start;
+}
+
+.loginBtn {
+  width: 100%;
+  height: 88rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}

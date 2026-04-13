@@ -1,0 +1,132 @@
+Loading project all files...
+Loading project all files success
+编译 app.json
+编译 ext.json
+编译 2 个页面json文件
+Loading project all files...
+Loading project all files...
+Loading project all files success
+Loading project all files success
+Loading project all files...
+Loading project all files success
+编译 app.json
+编译 ext.json
+编译 2 个页面json文件
+analyzing codes...
+ignoring files: project.private.config.json
+analyzing codes success
+Ignored by code analyzer: project.private.config.json
+analyzing codes...
+ignoring files: project.private.config.json
+analyzing codes success
+Ignored by code analyzer: project.private.config.json
+getDevCodeByFileList-miniProgram
+编译 app.wxss
+编译 app.wxss
+编译 pages/index/index.wxss
+编译 pages/index/index.wxss
+编译 pages/login/login.wxss
+编译 pages/login/login.wxss
+app.wxss
+pages/index/index.wxss
+pages/login/login.wxss
+app.wxss
+pages/index/index.wxss
+pages/login/login.wxss
+getDevCodeByFileList-miniProgram
+编译 pages/index/index.wxml
+编译 pages/index/index.wxml
+编译 pages/login/login.wxml
+编译 pages/login/login.wxml
+pages/index/index.wxml
+pages/login/login.wxml
+pages/index/index.wxml
+pages/login/login.wxml
+getDevCodeByFileList-miniProgram
+编译 app.js
+编译 app.js
+编译 pages/index/index.js
+编译 pages/index/index.js
+编译 pages/login/login.js
+编译 pages/login/login.js
+编译 utils/request.js
+编译 utils/request.js
+getDevCodeByFileList-miniProgram
+app.js
+pages/index/index.js
+utils/request.js
+app.js
+pages/index/index.js
+pages/login/login.js
+utils/request.js
+pages/login/login.js
+analyzing codes...
+ignoring files: project.private.config.json
+analyzing codes success
+Ignored by code analyzer: project.private.config.json
+getDevCodeByFileList-miniProgram
+编译 pages/login/login.wxml
+编译 pages/login/login.wxml
+pages/login/login.wxml
+pages/login/login.wxml
+getDevCodeByFileList-miniProgram
+编译 pages/login/login.js
+编译 pages/login/login.js
+pages/login/login.js
+pages/login/login.js
+analyzing codes...
+ignoring files: project.private.config.json
+analyzing codes success
+Ignored by code analyzer: project.private.config.json
+getDevCodeByFileList-miniProgram
+编译 pages/login/login.wxss
+编译 pages/login/login.wxss
+pages/login/login.wxss
+pages/login/login.wxss
+analyzing codes...
+ignoring files: project.private.config.json
+analyzing codes success
+Ignored by code analyzer: project.private.config.json
+getDevCodeByFileList-miniProgram
+编译 pages/login/login.wxss
+编译 pages/login/login.wxss
+pages/login/login.wxss
+pages/login/login.wxss
+编译 app.json
+编译 ext.json
+编译 2 个页面json文件
+analyzing codes...
+ignoring files: project.private.config.json
+analyzing codes success
+Ignored by code analyzer: project.private.config.json
+analyzing codes...
+ignoring files: project.private.config.json
+analyzing codes success
+Ignored by code analyzer: project.private.config.json
+编译 app.json
+app.json: 未找到 ["pages"][2] 对应的 pages/reservation/reservation.wxml 文件
+编译 app.json
+app.json: 未找到 ["pages"][2] 对应的 pages/reservation/reservation.wxml 文件
+编译 app.json
+app.json: 未找到 ["pages"][2] 对应的 pages/reservation/reservation.js 文件
+编译 app.json
+app.json: 未找到 ["pages"][3] 对应的 pages/myReservations/myReservations.js 文件
+编译 app.json
+app.json: 未找到 ["pages"][4] 对应的 pages/reservationDetail/reservationDetail.wxml 文件
+编译 app.json
+app.json: 未找到 ["pages"][4] 对应的 pages/reservationDetail/reservationDetail.wxml 文件
+编译 app.json
+app.json: 未找到 ["pages"][4] 对应的 pages/reservationDetail/reservationDetail.wxml 文件
+编译 app.json
+app.json: 未找到 ["pages"][4] 对应的 pages/reservationDetail/reservationDetail.wxml 文件
+编译 app.json
+app.json: 未找到 ["pages"][4] 对应的 pages/reservationDetail/reservationDetail.wxml 文件
+编译 app.json
+app.json: 未找到 ["pages"][4] 对应的 pages/reservationDetail/reservationDetail.wxml 文件
+编译 app.json
+app.json: ["tabBar"]["list"][0]["iconPath"]: "static/tab-home.png" 未找到
+["tabBar"]["list"][0]["selectedIconPath"]: "static/tab-home-active.png" 未找到
+["tabBar"]["list"][1]["iconPath"]: "static/tab-calendar.png" 未找到
+["tabBar"]["list"][1]["selectedIconPath"]: "static/tab-calendar-active.png" 未找到
+["tabBar"]["list"][2]["iconPath"]: "static/tab-user.png" 未找到
+["tabBar"]["list"][2]["selectedIconPath"]: "static/tab-user-active.png" 未找到

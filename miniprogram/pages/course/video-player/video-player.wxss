@@ -1,0 +1,17 @@
+.page {
+  padding: 24rpx;
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.player {
+  width: 100%;
+  height: 420rpx;
+  background: #000000;
+  border-radius: 16rpx;
+}
+

@@ -1,0 +1,49 @@
+.page {
+  padding: 24rpx 0;
+}
+
+.sectionTitle {
+  font-size: 30rpx;
+  font-weight: 700;
+  margin-bottom: 18rpx;
+}
+
+.formItem {
+  margin-bottom: 18rpx;
+}
+
+.formLabel {
+  font-size: 26rpx;
+  color: rgba(17, 17, 17, 0.65);
+  margin-bottom: 10rpx;
+}
+
+.formInput {
+  margin-bottom: 0;
+  background: #fff;
+}
+
+.picker {
+  height: 72rpx;
+  padding: 0 18rpx;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  color: rgba(17, 17, 17, 0.75);
+  background: #fff;
+}
+
+.saveBtn {
+  width: 100%;
+  height: 88rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-top: 18rpx;
+}

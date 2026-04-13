@@ -1,0 +1,88 @@
+<view class="page">
+  <block wx:if="{{isTeacher}}">
+    <view class="card" wx:if="{{detail}}">
+      <view class="title">{{detail.title}}</view>
+      <view class="meta">答题时长：{{detail.durationMinutes != null ? detail.durationMinutes + ' 分钟' : '不限'}}</view>
+      <view class="meta">开放：{{detail.startAt || '不限'}} ~ {{detail.endAt || '不限'}}</view>
+      <view class="badge badge-{{detail.status === 1 ? 'live' : (detail.status === 2 ? 'off' : 'draft')}}">{{statusText}}</view>
+    </view>
+
+    <view class="card" wx:if="{{detail && (detail.status === 1 || detail.status === 2)}}">
+      <view class="sectionTitle">批改答卷</view>
+      <view class="tip">查看学生已提交答卷，可修改各题得分（含简答题），保存后自动重算总分。</view>
+      <view class="btnRow">
+        <button class="btnPrimary" bindtap="goGradeAttempts">答卷列表</button>
+        <button class="btnGhost" bindtap="goExamStats">考试统计</button>
+        <button class="btnGhost" bindtap="goExamAnalysis">试卷分析</button>
+        <button class="btnGhost" bindtap="exportScores">导出成绩表</button>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{detail && isDraft}}">
+      <view class="sectionTitle">添加题目</view>
+      <view class="typeRow">
+        <view class="typeBtn {{newQ.qType === 1 ? 'typeBtnOn' : ''}}" data-type="1" bindtap="setQType">单选题</view>
+        <view class="typeBtn {{newQ.qType === 3 ? 'typeBtnOn' : ''}}" data-type="3" bindtap="setQType">判断题</view>
+      </view>
+      <textarea class="textarea" placeholder="题干" value="{{newQ.stem}}" bindinput="onStemInput" />
+      <block wx:if="{{newQ.qType === 1}}">
+        <input class="input" placeholder="选项 A" value="{{newQ.optA}}" bindinput="onOptA" />
+        <input class="input" placeholder="选项 B" value="{{newQ.optB}}" bindinput="onOptB" />
+        <input class="input" placeholder="选项 C" value="{{newQ.optC}}" bindinput="onOptC" />
+        <input class="input" placeholder="选项 D" value="{{newQ.optD}}" bindinput="onOptD" />
+        <picker mode="selector" range="{{correctChoices}}" value="{{correctIndex}}" bindchange="onCorrectPick">
+          <view class="input">正确答案：{{newQ.correctAnswer || '请选择'}}</view>
+        </picker>
+      </block>
+      <block wx:if="{{newQ.qType === 3}}">
+        <picker mode="selector" range="{{tfLabels}}" value="{{tfIndex}}" bindchange="onTfPick">
+          <view class="input">正确答案：{{tfLabels[tfIndex]}}</view>
+        </picker>
+      </block>
+      <view class="row2">
+        <view class="inputLabel">分值</view>
+        <input class="input" type="digit" placeholder="请输入分值" value="{{newQ.score}}" bindinput="onScoreInput" />
+      </view>
+      <button class="btnPrimary" loading="{{adding}}" disabled="{{adding}}" bindtap="addQuestion">保存题目</button>
+      <button class="btnPrimary" loading="{{publishing}}" disabled="{{publishing}}" bindtap="publishPaper">发布试卷</button>
+      <view class="tip">发布后无法在此页继续改题；请确认题目无误后再发布。</view>
+    </view>
+
+    <view class="card">
+      <view class="sectionTitle">题目列表（{{questions.length}}）</view>
+      <view wx:if="{{!questions.length}}" class="tip">暂无题目</view>
+      <block wx:else>
+        <view wx:for="{{questions}}" wx:key="id" class="qItem">
+          <view class="qStem">{{index + 1}}. {{item.stem}}</view>
+          <view class="qMeta">{{item.typeLabel}} · {{item.score}} 分 · 答案 {{item.correctAnswer || '—'}}</view>
+          <block wx:if="{{item.options && item.options.length}}">
+            <view wx:for="{{item.options}}" wx:for-item="op" wx:key="key" class="optLine">{{op.key}}. {{op.text}}</view>
+          </block>
+        </view>
+      </block>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="card" wx:if="{{studentDetail}}">
+      <view class="title">{{studentDetail.title}}</view>
+      <view class="meta">答题时长：{{studentDetail.durationMinutes != null ? studentDetail.durationMinutes + ' 分钟' : '不限'}}</view>
+      <view class="meta">开放：{{studentDetail.startAt || '不限'}} ~ {{studentDetail.endAt || '不限'}}</view>
+    </view>
+
+    <view class="card" wx:if="{{studentDetail && !examStarted && !examSubmitted}}">
+      <button class="btnPrimary" loading="{{startingExam}}" disabled="{{startingExam}}" bindtap="startStudentExam">开始答题</button>
+      <view class="tip">开始后将创建答卷，请作答完成后提交。</view>
+    </view>
+
+    <view class="card" wx:if="{{studentDetail && examStarted && !examSubmitted}}">
+      <view class="sectionTitle">答题中</view>
+      <view class="tip">请在逐题作答页面完成作答并提交试卷。</view>
+    </view>
+
+    <view class="card" wx:if="{{examSubmitted && examScoreResult}}">
+      <view class="title">已提交</view>
+      <view class="meta">得分：{{examScoreResult.totalScore != null ? examScoreResult.totalScore : '—'}}</view>
+    </view>
+  </block>
+</view>

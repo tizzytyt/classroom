@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.LearningProgressMapper">
+  <select id="countCompletedResources" resultType="int">
+    select count(1)
+    from learning_progress lp
+    join course_resource cr on cr.id = lp.resource_id
+    where cr.course_id = #{courseId}
+      and cr.status = 1
+      and lp.user_id = #{studentId}
+      and lp.learn_status = 2
+      and lp.progress_percent >= 100
+  </select>
+
+  <select id="avgProgressPercent" resultType="double">
+    select avg(lp.progress_percent)
+    from learning_progress lp
+    join course_resource cr on cr.id = lp.resource_id
+    where cr.course_id = #{courseId}
+      and cr.status = 1
+      and lp.user_id = #{studentId}
+  </select>
+
+  <select id="lastActiveAt" resultType="java.time.LocalDateTime">
+    select max(lp.last_viewed_at)
+    from learning_progress lp
+    join course_resource cr on cr.id = lp.resource_id
+    where cr.course_id = #{courseId}
+      and cr.status = 1
+      and lp.user_id = #{studentId}
+  </select>
+</mapper>
+

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.CheckinMapper">
+  <resultMap id="CheckinMap" type="com.edu.classroom.entity.Checkin">
+    <id property="id" column="id"/>
+    <result property="courseId" column="course_id"/>
+    <result property="title" column="title"/>
+    <result property="checkinCode" column="checkin_code"/>
+    <result property="startAt" column="start_at"/>
+    <result property="endAt" column="end_at"/>
+    <result property="createdBy" column="created_by"/>
+    <result property="status" column="status"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <resultMap id="CheckinRecordMap" type="com.edu.classroom.entity.CheckinRecord">
+    <id property="id" column="id"/>
+    <result property="checkinId" column="checkin_id"/>
+    <result property="studentId" column="student_id"/>
+    <result property="checkedInAt" column="checked_in_at"/>
+    <result property="source" column="source"/>
+  </resultMap>
+
+  <resultMap id="StudentCheckinHistoryMap" type="com.edu.classroom.dto.student.StudentCheckinHistoryDto">
+    <id property="id" column="id"/>
+    <result property="courseId" column="course_id"/>
+    <result property="title" column="title"/>
+    <result property="startAt" column="start_at"/>
+    <result property="endAt" column="end_at"/>
+    <result property="status" column="status"/>
+    <result property="checkedIn" column="checked_in"/>
+    <result property="checkedInAt" column="checked_in_at"/>
+  </resultMap>
+
+  <select id="findById" parameterType="long" resultMap="CheckinMap">
+    select * from checkin where id = #{id}
+  </select>
+
+  <select id="findByCheckinCode" resultMap="CheckinMap">
+    select * from checkin where checkin_code = #{code} limit 1
+  </select>
+
+  <select id="findActiveByCheckinCode" resultMap="CheckinMap">
+    select * from checkin
+    where checkin_code = #{code}
+      and status = 1
+      and (end_at is null or end_at &gt; now())
+    order by id desc
+    limit 1
+  </select>
+
+  <select id="countByCheckinCode" resultType="int">
+    select count(1) from checkin where checkin_code = #{code}
+  </select>
+
+  <select id="findRecord" resultMap="CheckinRecordMap">
+    select * from checkin_record where checkin_id = #{checkinId} and student_id = #{studentId} limit 1
+  </select>
+
+  <insert id="insertRecord">
+    insert into checkin_record(id, checkin_id, student_id, checked_in_at, source)
+    values (UUID_SHORT(), #{checkinId}, #{studentId}, now(), #{source})
+  </insert>
+
+  <insert id="insertCheckin">
+    insert into checkin(
+      id, course_id, title, checkin_code, start_at, end_at, created_by, status, created_at
+    ) values (
+      UUID_SHORT(),
+      #{courseId},
+      #{title},
+      #{checkinCode},
+      #{startAt},
+      #{endAt},
+      #{createdBy},
+      1,
+      now()
+    )
+  </insert>
+
+  <select id="listByCourseAndTeacher" resultMap="CheckinMap">
+    select c.*
+    from checkin c
+    join course co on co.id = c.course_id
+    where c.course_id = #{courseId}
+      and co.teacher_id = #{teacherId}
+      and co.status = 1
+    order by c.start_at desc
+  </select>
+
+  <update id="closeByTeacher">
+    update checkin c
+    join course co on co.id = c.course_id
+    set c.end_at = if(c.end_at is null or c.end_at > now(), now(), c.end_at),
+        c.status = 0
+    where c.id = #{checkinId}
+      and c.course_id = #{courseId}
+      and co.teacher_id = #{teacherId}
+      and co.status = 1
+      and c.status = 1
+  </update>
+
+  <select id="listRecordsByCheckin" resultMap="CheckinRecordMap">
+    select * from checkin_record
+    where checkin_id = #{checkinId}
+  </select>
+
+  <select id="countCheckinsByCourse" parameterType="long" resultType="int">
+    select count(*) from checkin
+    where course_id = #{courseId}
+  </select>
+
+  <select id="countRecordsByCourse" parameterType="long" resultType="int">
+    select count(r.id)
+    from checkin_record r
+    join checkin c on c.id = r.checkin_id
+    where c.course_id = #{courseId}
+  </select>
+
+  <select id="countRecordsByCourseAndStudent" resultType="int">
+    select count(r.id)
+    from checkin_record r
+    join checkin c on c.id = r.checkin_id
+    where c.course_id = #{courseId}
+      and r.student_id = #{studentId}
+  </select>
+
+  <select id="listHistoryByCourseAndStudent" resultMap="StudentCheckinHistoryMap">
+    select
+      c.id,
+      c.course_id,
+      c.title,
+      c.start_at,
+      c.end_at,
+      c.status,
+      (case when r.id is null then 0 else 1 end) as checked_in,
+      r.checked_in_at
+    from checkin c
+    join course_member cm on cm.course_id = c.course_id
+      and cm.user_id = #{studentId}
+      and cm.member_role = 'STUDENT'
+      and cm.status = 1
+    join course co on co.id = c.course_id and co.status = 1
+    left join checkin_record r on r.checkin_id = c.id and r.student_id = #{studentId}
+    where c.course_id = #{courseId}
+    order by c.start_at desc
+  </select>
+</mapper>

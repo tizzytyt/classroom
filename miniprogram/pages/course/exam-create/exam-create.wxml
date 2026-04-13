@@ -1,0 +1,76 @@
+<view class="page">
+  <view class="card">
+    <view class="sectionTitle">创建试卷</view>
+    <view class="sectionSub">可先添加题目再点「创建试卷」；开放时段用下方日期与时间选择器。</view>
+    <input class="input" placeholder="试卷标题" value="{{createForm.title}}" bindinput="onTitleInput" />
+    <input class="input" type="number" placeholder="答题时长（分钟，选填）" value="{{createForm.durationMinutes}}" bindinput="onDurationInput" />
+    <view class="switchRow">
+      <view class="switchLabel">打乱题目顺序</view>
+      <switch checked="{{createForm.shuffleQuestions}}" bindchange="onShuffleChange" />
+    </view>
+
+    <view class="draftSectionTitle">题目（创建前可编辑）</view>
+    <view wx:if="{{editingDraftIndex >= 0}}" class="editHint">正在编辑第 {{editingDraftIndex + 1}} 题，保存到列表或取消后继续添加新题。</view>
+    <view class="typeRow">
+      <view class="typeBtn {{newQ.qType === 1 ? 'typeBtnOn' : ''}}" data-type="1" bindtap="setQType">单选题</view>
+      <view class="typeBtn {{newQ.qType === 3 ? 'typeBtnOn' : ''}}" data-type="3" bindtap="setQType">判断题</view>
+    </view>
+    <textarea class="textarea" placeholder="题干" value="{{newQ.stem}}" bindinput="onStemInput" />
+    <block wx:if="{{newQ.qType === 1}}">
+      <input class="input" placeholder="选项 A" value="{{newQ.optA}}" bindinput="onOptA" />
+      <input class="input" placeholder="选项 B" value="{{newQ.optB}}" bindinput="onOptB" />
+      <input class="input" placeholder="选项 C" value="{{newQ.optC}}" bindinput="onOptC" />
+      <input class="input" placeholder="选项 D" value="{{newQ.optD}}" bindinput="onOptD" />
+      <picker mode="selector" range="{{correctChoices}}" value="{{correctIndex}}" bindchange="onCorrectPick">
+        <view class="pickerCell pickerCellFull">正确答案：{{newQ.correctAnswer || '请选择'}}</view>
+      </picker>
+    </block>
+    <block wx:if="{{newQ.qType === 3}}">
+      <picker mode="selector" range="{{tfLabels}}" value="{{tfIndex}}" bindchange="onTfPick">
+        <view class="pickerCell pickerCellFull">正确答案：{{tfLabels[tfIndex]}}</view>
+      </picker>
+    </block>
+    <view class="row2">
+      <view class="inputLabel">分值</view>
+      <input class="input" type="digit" placeholder="请输入分值" value="{{newQ.score}}" bindinput="onScoreInput" />
+    </view>
+    <button class="btnPrimary" bindtap="saveDraftQuestion">{{editingDraftIndex >= 0 ? '更新到列表' : '加入题目列表'}}</button>
+    <button wx:if="{{editingDraftIndex >= 0}}" class="btnGhost draftMini" bindtap="cancelEditDraft">取消编辑</button>
+
+    <view wx:if="{{draftQuestions.length}}">
+      <view class="draftSectionTitle">已准备 {{draftQuestions.length}} 道题</view>
+      <view wx:for="{{draftQuestions}}" wx:key="draftId" class="draftItem">
+        <view class="draftItemTop">{{index + 1}}. {{item.typeLabel}} · {{item.score}} 分 · {{item.previewStem}}</view>
+        <view class="draftOps">
+          <button class="draftMini" size="mini" data-idx="{{index}}" bindtap="editDraftQuestion">编辑</button>
+          <button class="draftMini" size="mini" type="warn" data-idx="{{index}}" bindtap="removeDraftQuestion">删除</button>
+        </view>
+      </view>
+    </view>
+
+    <view class="timeBlock">
+      <view class="timeLabel">开放开始</view>
+      <view class="timeRow">
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="pickerCell">日期 {{startDate}}</view>
+        </picker>
+        <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
+          <view class="pickerCell">时间 {{startTime}}</view>
+        </picker>
+      </view>
+    </view>
+    <view class="timeBlock">
+      <view class="timeLabel">开放结束</view>
+      <view class="timeRow">
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="pickerCell">日期 {{endDate}}</view>
+        </picker>
+        <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+          <view class="pickerCell">时间 {{endTime}}</view>
+        </picker>
+      </view>
+    </view>
+    <button class="btnPrimary" loading="{{creating}}" disabled="{{creating}}" bindtap="createPaper">创建试卷{{draftQuestions.length ? '（含' + draftQuestions.length + '道题）' : ''}}</button>
+  </view>
+</view>
+

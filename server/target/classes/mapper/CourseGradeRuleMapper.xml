@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.CourseGradeRuleMapper">
+  <resultMap id="RuleMap" type="com.edu.classroom.entity.CourseGradeRule">
+    <id property="id" column="id"/>
+    <result property="courseId" column="course_id"/>
+    <result property="assignmentWeight" column="assignment_weight"/>
+    <result property="checkinWeight" column="checkin_weight"/>
+    <result property="resourceWeight" column="resource_weight"/>
+    <result property="examWeight" column="exam_weight"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <select id="findByCourseId" resultMap="RuleMap">
+    select * from course_grade_rule where course_id = #{courseId} limit 1
+  </select>
+
+  <insert id="upsert">
+    insert into course_grade_rule(id, course_id, assignment_weight, checkin_weight, resource_weight, exam_weight)
+    values (UUID_SHORT(), #{courseId}, #{assignmentWeight}, #{checkinWeight}, #{resourceWeight}, #{examWeight})
+    on duplicate key update
+      assignment_weight = values(assignment_weight),
+      checkin_weight = values(checkin_weight),
+      resource_weight = values(resource_weight),
+      exam_weight = values(exam_weight),
+      updated_at = now()
+  </insert>
+</mapper>

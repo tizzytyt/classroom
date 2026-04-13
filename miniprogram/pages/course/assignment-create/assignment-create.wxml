@@ -1,0 +1,35 @@
+<view class="page">
+  <view class="card">
+    <view class="sectionTitle">创建作业</view>
+    <view class="sectionSub">截止时间用下方日期与时间选择器选择，提交时自动格式化为服务器所需时间。</view>
+    <input class="input" placeholder="作业标题" value="{{createForm.title}}" bindinput="onCreateTitleInput" />
+    <textarea class="textarea" placeholder="作业内容/要求（选填）" value="{{createForm.content}}" bindinput="onCreateContentInput" />
+    <view class="timeBlock">
+      <view class="timeLabel">截止时间</view>
+      <view class="timeRow">
+        <picker mode="date" value="{{dueDate}}" bindchange="onDueDateChange">
+          <view class="pickerCell">日期 {{dueDate}}</view>
+        </picker>
+        <picker mode="time" value="{{dueTime}}" bindchange="onDueTimeChange">
+          <view class="pickerCell">时间 {{dueTime}}</view>
+        </picker>
+      </view>
+    </view>
+    <input class="input inputTop" placeholder="总分（选填，默认100）" value="{{createForm.totalScore}}" bindinput="onCreateTotalScoreInput" />
+    <view class="attachmentBlock">
+      <view class="timeLabel">作业附件（选填）</view>
+      <button
+        class="btnPrimary btnUpload"
+        loading="{{attachmentUploading}}"
+        disabled="{{attachmentUploading || creating}}"
+        bindtap="chooseAssignmentAttachment"
+      >选择本地文件上传</button>
+      <view wx:if="{{attachmentFileName}}" class="attachmentRow">
+        <text class="attachmentName">{{attachmentFileName}}</text>
+        <text class="attachmentRemove" bindtap="clearAssignmentAttachment">移除</text>
+      </view>
+    </view>
+    <button class="btnPrimary" loading="{{creating}}" disabled="{{creating || attachmentUploading}}" bindtap="createAssignment">发布作业</button>
+  </view>
+</view>
+

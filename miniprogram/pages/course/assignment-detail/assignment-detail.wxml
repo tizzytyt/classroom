@@ -1,0 +1,63 @@
+<view class="page">
+  <view class="card" wx:if="{{assignment}}">
+    <view class="titleRow">
+      <view class="title">{{assignment.title}}</view>
+      <view class="tagClosed" wx:if="{{pastDue}}">已截止</view>
+    </view>
+    <view class="meta">截止时间：{{assignment.dueAt}}</view>
+    <view class="meta">总分：{{assignment.totalScore}}</view>
+    <view class="content">{{assignment.content || '暂无作业说明'}}</view>
+  </view>
+
+  <view class="card" wx:if="{{isTeacher}}">
+    <view class="sectionTitle">学生提交与评分</view>
+    <view wx:if="{{loadingSubmissions}}" class="tip">加载中...</view>
+    <view wx:elif="{{!teacherSubmissions.length}}" class="tip">暂无已提交作业</view>
+    <block wx:else>
+      <view wx:for="{{teacherSubmissions}}" wx:key="submissionId" class="studentSubmit">
+        <view class="studentName">{{item.studentName}}</view>
+        <view class="meta">提交时间：{{item.submittedAt}}</view>
+        <view class="submitText">{{item.submitText || '（无文字说明）'}}</view>
+        <view class="attachBlock" wx:if="{{item.attachmentList && item.attachmentList.length}}">
+          <view class="attachLabel">附件：</view>
+          <view wx:for="{{item.attachmentList}}" wx:for-item="furl" wx:key="*this" class="attachLink" data-url="{{furl}}" bindtap="openSubmittedFile">{{furl}}</view>
+        </view>
+        <view class="meta" wx:if="{{item.gradeScore != null}}">已评分：{{item.gradeScore}} 分（已锁定，不可修改）</view>
+        <view class="gradeBtnRow" wx:if="{{item.gradeScore == null}}">
+          <button size="mini" class="gradeBtn" data-submission-id="{{item.submissionId}}" bindtap="startGrade">评分</button>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card" wx:if="{{isTeacher && gradingSubmissionId}}">
+    <view class="sectionTitle">评分</view>
+    <view class="meta">学生：{{currentGradingStudentName}}</view>
+    <input class="input" placeholder="分数" value="{{gradeForm.score}}" bindinput="onGradeScoreInput" />
+    <textarea class="textarea" placeholder="评语（选填）" value="{{gradeForm.comment}}" bindinput="onGradeCommentInput" />
+    <button class="btnPrimary" loading="{{gradingSaving}}" bindtap="saveGrade">保存评分</button>
+    <button class="btnGhost" bindtap="cancelGrade">取消</button>
+  </view>
+
+  <view class="card" wx:if="{{!isTeacher && grade}}">
+    <view class="sectionTitle">批改结果</view>
+    <view class="meta">得分：{{grade.score}}</view>
+    <view class="meta">评语：{{grade.comment || '无评语'}}</view>
+  </view>
+
+  <view class="card" wx:if="{{!isTeacher}}">
+    <view class="sectionTitle">我的提交</view>
+    <view class="hint warn" wx:if="{{grade}}">教师已批改，作业内容不可再修改。</view>
+    <view class="hint warn" wx:elif="{{pastDue}}">已超过截止时间，无法再提交或修改作业。</view>
+    <view class="hint" wx:else>可填写文字说明，并上传文件或图片（与文档描述一致）。</view>
+    <textarea class="textarea" placeholder="作业文字说明（可与附件二选一或同时提交）" value="{{contentText}}" bindinput="onInput" disabled="{{grade || pastDue}}" />
+    <button wx:if="{{!grade && !pastDue}}" class="btnSecondary" bindtap="chooseAttachment">选择文件 / 图片上传</button>
+    <view wx:if="{{attachmentFiles.length}}" class="attachList">
+      <view wx:for="{{attachmentFiles}}" wx:key="fileUrl" class="attachRow">
+        <view class="attachName">{{item.fileName}}</view>
+        <view wx:if="{{!grade && !pastDue}}" class="attachRemove" data-url="{{item.fileUrl}}" bindtap="removeAttachment">移除</view>
+      </view>
+    </view>
+    <button wx:if="{{!grade && !pastDue}}" class="btn" type="primary" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">提交作业</button>
+  </view>
+</view>

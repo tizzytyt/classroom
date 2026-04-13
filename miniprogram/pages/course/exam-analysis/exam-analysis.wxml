@@ -1,0 +1,43 @@
+<view class="page">
+  <view class="card" wx:if="{{paperTitle}}">
+    <view class="title">{{paperTitle}}</view>
+    <view class="tip">正确率口径：客观题（非简答）按得分=满分视为正确。</view>
+  </view>
+
+  <view class="card">
+    <view class="sectionTitle">错题排行 Top 10</view>
+    <view wx:if="{{loading}}" class="tip">加载中...</view>
+    <view wx:elif="{{!wrongRank.length}}" class="tip">暂无数据</view>
+    <block wx:else>
+      <view wx:for="{{wrongRank}}" wx:key="questionId" class="rankItem">
+        <view class="rankTop">
+          <view class="rankNo">{{index + 1}}</view>
+          <view class="rankStem">{{item.stem}}</view>
+        </view>
+        <view class="meta">错误人数：{{item.wrongCount}} / {{item.participantCount}} · 正确率：{{item.correctRate}}%</view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="sectionTitle">每题统计</view>
+    <view wx:if="{{loading}}" class="tip">加载中...</view>
+    <view wx:elif="{{!questions.length}}" class="tip">暂无题目或暂无已提交答卷</view>
+    <block wx:else>
+      <view wx:for="{{questions}}" wx:key="questionId" class="qItem">
+        <view class="qStem">{{index + 1}}. {{item.stem}}</view>
+        <view class="meta">参与：{{item.participantCount}} 人 · 满分：{{item.fullScore}} · 平均分：{{item.avgScore}}</view>
+        <view class="meta">得分率：{{item.scoreRate}}%</view>
+        <view class="barTrack">
+          <view class="barFill barScore" style="width: {{item.scoreRate}}%;"></view>
+        </view>
+        <view class="meta" wx:if="{{item.correctRate != null}}">正确率：{{item.correctRate}}% · 错误：{{item.wrongCount}} 人</view>
+        <view class="barTrack" wx:if="{{item.correctRate != null}}">
+          <view class="barFill barCorrect" style="width: {{item.correctRate}}%;"></view>
+        </view>
+        <view class="tip" wx:if="{{item.correctRate == null}}">简答题不计算正确率（以得分率为准）。</view>
+      </view>
+    </block>
+  </view>
+</view>
+

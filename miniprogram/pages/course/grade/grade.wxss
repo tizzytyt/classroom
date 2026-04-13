@@ -1,0 +1,95 @@
+.page {
+  padding: 24rpx;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.titleRow .title {
+  margin-bottom: 0;
+}
+
+.miniExportBtn {
+  margin: 0;
+  font-size: 22rpx;
+  border-radius: 999rpx;
+}
+
+.subHint {
+  font-size: 24rpx;
+  color: #888888;
+  line-height: 1.5;
+  margin-bottom: 12rpx;
+}
+
+.tip {
+  font-size: 26rpx;
+  color: #888888;
+}
+
+.item {
+  font-size: 26rpx;
+  color: #333333;
+  margin-top: 8rpx;
+}
+
+.final {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #e67e22;
+  margin-top: 16rpx;
+}
+
+.pageLoading {
+  padding: 48rpx 24rpx;
+  text-align: center;
+}
+
+.stuBlock {
+  padding: 20rpx 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.stuBlock:first-of-type {
+  border-top: none;
+  padding-top: 8rpx;
+}
+
+.stuName {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.item.sub {
+  font-size: 24rpx;
+  color: #666666;
+  line-height: 1.5;
+}
+
+.stuFinal {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #e67e22;
+  margin-top: 8rpx;
+}
+

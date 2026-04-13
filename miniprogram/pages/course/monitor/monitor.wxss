@@ -1,0 +1,149 @@
+.page {
+  padding: 24rpx;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.sub, .tip {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.ruleBox {
+  margin-top: 16rpx;
+  padding: 16rpx;
+  background: #f7f8fa;
+  border-radius: 12rpx;
+  border: 1px solid #eee;
+}
+
+.ruleTitle {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.ruleLine {
+  font-size: 22rpx;
+  color: #666;
+  line-height: 1.55;
+  margin-top: 8rpx;
+}
+
+.item {
+  padding: 16rpx 0;
+  border-top: 1px solid #f5f5f5;
+}
+
+.rowTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.name {
+  font-size: 28rpx;
+}
+
+.meta {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 6rpx;
+}
+
+.ops {
+  margin-top: 10rpx;
+}
+
+.miniBtn {
+  margin: 0;
+}
+
+.badge {
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: #fff;
+}
+
+.badge-LOW { background: #52c41a; }
+.badge-MEDIUM { background: #faad14; }
+.badge-HIGH { background: #ff4d4f; }
+
+.mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 10;
+}
+
+.modal {
+  position: fixed;
+  left: 24rpx;
+  right: 24rpx;
+  top: 20%;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  z-index: 11;
+}
+
+.modalTitle {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.recItem {
+  padding: 12rpx 0;
+  border-top: 1px solid #f5f5f5;
+}
+
+.recName {
+  font-size: 26rpx;
+}
+
+.recMeta {
+  font-size: 22rpx;
+  color: #888;
+  margin-top: 4rpx;
+}
+
+.btnClose {
+  margin-top: 16rpx;
+  border-radius: 999rpx;
+}
+
+.reasonInput {
+  margin-top: 14rpx;
+  height: 72rpx;
+  border: 1px solid #e5e5e5;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+}
+
+.btnPush {
+  margin-top: 12rpx;
+  border-radius: 999rpx;
+  background: #4b7cff;
+  color: #fff;
+  border: none;
+}
+

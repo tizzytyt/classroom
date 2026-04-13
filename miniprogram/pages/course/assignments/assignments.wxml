@@ -1,0 +1,32 @@
+<view class="page">
+  <view class="card">
+    <view class="titleRow">
+      <view class="title">{{isTeacher ? '我的作业' : '课程作业'}}</view>
+      <button wx:if="{{isTeacher}}" size="mini" class="miniCreateBtn" bindtap="goCreateAssignment">创建</button>
+    </view>
+    <view wx:if="{{loading}}" class="tip">加载中...</view>
+    <view wx:elif="{{!list.length}}" class="tip">暂无作业</view>
+    <block wx:else>
+      <view wx:for="{{list}}" wx:key="id" class="item" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="itemTitleRow">
+          <view class="name">{{item.title}}</view>
+          <view class="tagsCol" wx:if="{{isTeacher}}">
+            <view class="tagPublished" wx:if="{{!item.isPastDue}}">已发布</view>
+            <view class="tagClosed" wx:if="{{item.isPastDue}}">已截止</view>
+          </view>
+          <view class="tagClosed" wx:elif="{{item.isPastDue}}">已截止</view>
+        </view>
+        <view class="meta">截止时间：{{item.dueAt}}</view>
+        <view class="meta">总分：{{item.totalScore}}</view>
+        <view class="teacherSubmitBar" wx:if="{{isTeacher}}">
+          <view class="progressMeta">已交 {{item.submitCount}} 人 · 未交 {{item.notSubmitCount}} 人 · 共 {{item.studentCount}} 人</view>
+          <view class="progressTrack">
+            <view class="progressFill" style="width: {{item.progressPercent}}%;"></view>
+          </view>
+        </view>
+        <view class="meta scoreLine" wx:if="{{!isTeacher && item.myScore != null}}">得分：{{item.myScore}}</view>
+      </view>
+    </block>
+  </view>
+</view>
+

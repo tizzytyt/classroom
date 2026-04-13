@@ -1,0 +1,26 @@
+<view class="page">
+  <view class="card" wx:if="{{detail}}">
+    <view class="title">{{detail.paperTitle}}</view>
+    <view class="meta">学生：{{detail.studentName}}</view>
+    <view class="meta">提交时间：{{detail.submittedAt || '—'}}</view>
+    <view class="meta">当前总分：{{detail.totalScore != null ? detail.totalScore : '—'}} · 客观题合计：{{detail.objectiveScore != null ? detail.objectiveScore : '—'}}</view>
+  </view>
+
+  <view class="card" wx:if="{{rows.length}}">
+    <view class="sectionTitle">逐题得分</view>
+    <view class="tip">得分不能超过该题满分；保存后自动重算总分与客观题合计。</view>
+    <block wx:for="{{rows}}" wx:key="questionId">
+      <view class="qItem">
+        <view class="qStem">{{index + 1}}. {{item.stem}}</view>
+        <view class="qMeta">{{item.typeLabel}} · 满分 {{item.fullScore != null ? item.fullScore : '—'}} · 标准答案 {{item.correctAnswer || '—'}}</view>
+        <view class="meta" style="margin-top:8rpx">学生作答</view>
+        <view class="answerBox">{{item.studentAnswer || '（未作答）'}}</view>
+        <view class="rowScore">
+          <text class="scoreLabel">本题得分</text>
+          <input class="scoreInput" type="digit" value="{{item.scoreInput}}" data-idx="{{index}}" bindinput="onScoreInput" />
+        </view>
+      </view>
+    </block>
+    <button class="btnPrimary" loading="{{saving}}" disabled="{{saving}}" bindtap="saveGrades">保存得分</button>
+  </view>
+</view>

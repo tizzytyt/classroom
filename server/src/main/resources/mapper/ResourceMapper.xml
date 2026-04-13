@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.ResourceMapper">
+  <resultMap id="ResourceMap" type="com.edu.classroom.entity.CourseResource">
+    <id property="id" column="id"/>
+    <result property="courseId" column="course_id"/>
+    <result property="title" column="title"/>
+    <result property="description" column="description"/>
+    <result property="category" column="category"/>
+    <result property="fileUrl" column="file_url"/>
+    <result property="fileName" column="file_name"/>
+    <result property="fileSize" column="file_size"/>
+    <result property="fileType" column="file_type"/>
+    <result property="uploaderId" column="uploader_id"/>
+    <result property="publishedAt" column="published_at"/>
+    <result property="status" column="status"/>
+  </resultMap>
+
+  <select id="listByCourse" parameterType="long" resultMap="ResourceMap">
+    select * from course_resource
+    where course_id = #{courseId} and status = 1
+    order by published_at desc
+  </select>
+
+  <select id="listByCourseAndTeacher" parameterType="long" resultMap="ResourceMap">
+    select cr.*
+    from course_resource cr
+    join course c on c.id = cr.course_id
+    where cr.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and cr.status = 1
+      and c.status = 1
+    order by cr.published_at desc
+  </select>
+
+  <select id="findCourseIdByResourceId" parameterType="long" resultType="long">
+    select course_id
+    from course_resource
+    where id = #{resourceId}
+      and status = 1
+    limit 1
+  </select>
+
+  <select id="countResourcesByCourse" parameterType="long" resultType="int">
+    select count(1) from course_resource
+    where course_id = #{courseId} and status = 1
+  </select>
+
+  <select id="listRecommendedForStudent" resultMap="ResourceMap">
+    select cr.*
+    from course_resource cr
+    left join learning_progress lp
+      on lp.resource_id = cr.id
+     and lp.user_id = #{studentId}
+    where cr.course_id = #{courseId}
+      and cr.status = 1
+      and (
+        lp.id is null
+        or lp.learn_status &lt;&gt; 2
+        or lp.progress_percent &lt; 100
+      )
+    order by cr.published_at desc
+    limit #{limit}
+  </select>
+
+  <insert id="insertResource">
+    insert into course_resource(
+      id, course_id, title, description, category,
+      file_url, file_name, file_size, file_type,
+      uploader_id, published_at, status
+    )
+    values (
+      UUID_SHORT(),
+      #{courseId},
+      #{title},
+      #{description},
+      #{category},
+      #{fileUrl},
+      #{fileName},
+      #{fileSize},
+      #{fileType},
+      #{uploaderId},
+      now(),
+      1
+    )
+  </insert>
+
+  <update id="updateResourceByTeacher">
+    update course_resource cr
+    join course c on c.id = cr.course_id
+    set cr.title = #{title},
+        cr.description = #{description},
+        cr.category = #{category}
+    where cr.id = #{resourceId}
+      and cr.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and cr.status = 1
+      and c.status = 1
+  </update>
+
+  <update id="softDeleteResourceByTeacher">
+    update course_resource cr
+    join course c on c.id = cr.course_id
+    set cr.status = 0
+    where cr.id = #{resourceId}
+      and cr.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and cr.status = 1
+      and c.status = 1
+  </update>
+
+  <insert id="upsertProgress">
+    insert into learning_progress(id, resource_id, user_id, learn_status, progress_percent, last_viewed_at, updated_at)
+    values (UUID_SHORT(), #{resourceId}, #{userId}, #{status}, #{percent}, now(), now())
+    on duplicate key update learn_status = values(learn_status), progress_percent = values(progress_percent), last_viewed_at = values(last_viewed_at), updated_at = values(updated_at)
+  </insert>
+</mapper>

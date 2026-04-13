@@ -1,0 +1,54 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="tip pageLoading">加载中...</view>
+
+  <block wx:else>
+    <view class="card" wx:if="{{isTeacher}}">
+      <view class="title">成绩与进度（全班）</view>
+      <view wx:if="{{!overview}}" class="tip">暂无统计数据</view>
+      <view wx:else>
+        <view class="item">选课人数：{{overview.studentCount != null ? overview.studentCount : '—'}}</view>
+        <view class="item">签到次数：{{overview.signInCount != null ? overview.signInCount : '—'}}</view>
+        <view class="item">平均出勤率：{{overview.attendancePct != null ? overview.attendancePct + '%' : '—'}}</view>
+        <view class="item">作业次数：{{overview.homeworkCount != null ? overview.homeworkCount : '—'}}</view>
+        <view class="item">平均作业完成率：{{overview.homeworkPct != null ? overview.homeworkPct + '%' : '—'}}</view>
+        <view class="final">全班平均分：{{overview.avgScore != null ? overview.avgScore : '—'}}</view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{isTeacher}}">
+      <view class="titleRow">
+        <view class="title">学生成绩明细</view>
+        <button size="mini" class="miniExportBtn" bindtap="exportFinalScores">导出总评成绩（Excel）</button>
+      </view>
+      <view wx:if="{{!studentGrades.length}}" class="tip">暂无选课学生，或名单加载为空</view>
+      <view wx:else>
+        <view wx:for="{{studentGrades}}" wx:key="studentIdKey" class="stuBlock">
+          <view class="stuName">{{item.studentName || '—'}}</view>
+          <view class="item sub">作业：{{item.assignmentScore != null ? item.assignmentScore : '—'}}　签到：{{item.checkinScore != null ? item.checkinScore : '—'}}　资源：{{item.resourceScore != null ? item.resourceScore : '—'}}　考试：{{item.examScore != null ? item.examScore : '—'}}</view>
+          <view class="stuFinal">总评：{{item.finalScore != null ? item.finalScore : '—'}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{!isTeacher && gradeRule}}">
+      <view class="title">总评成绩构成</view>
+      <view class="subHint">以下为本课程总评计算时各项成绩所占比例（与教师课程设置一致）。</view>
+      <view class="item">作业成绩占比：{{gradeRule.assignmentPct != null ? gradeRule.assignmentPct + '%' : '—'}}</view>
+      <view class="item">签到成绩占比：{{gradeRule.checkinPct != null ? gradeRule.checkinPct + '%' : '—'}}</view>
+      <view class="item">资源学习占比：{{gradeRule.resourcePct != null ? gradeRule.resourcePct + '%' : '—'}}</view>
+      <view class="item">考试成绩占比：{{gradeRule.examPct != null ? gradeRule.examPct + '%' : '—'}}</view>
+    </view>
+
+    <view class="card" wx:if="{{!isTeacher}}">
+      <view class="title">课程成绩</view>
+      <view wx:if="{{!grade}}" class="tip">暂无成绩数据</view>
+      <view wx:else>
+        <view class="item">作业成绩：{{grade.assignmentScore}}</view>
+        <view class="item">签到成绩：{{grade.checkinScore}}</view>
+        <view class="item">资源学习成绩：{{grade.resourceScore}}</view>
+        <view class="item">考试成绩：{{grade.examScore != null ? grade.examScore : '—'}}</view>
+        <view class="final">总评成绩：{{grade.finalScore}}</view>
+      </view>
+    </view>
+  </block>
+</view>

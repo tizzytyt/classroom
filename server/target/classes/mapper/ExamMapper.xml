@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.classroom.mapper.ExamMapper">
+  <resultMap id="PaperMap" type="com.edu.classroom.entity.ExamPaper">
+    <id property="id" column="id"/>
+    <result property="courseId" column="course_id"/>
+    <result property="title" column="title"/>
+    <result property="durationMinutes" column="duration_minutes"/>
+    <result property="startAt" column="start_at"/>
+    <result property="endAt" column="end_at"/>
+    <result property="shuffleQuestions" column="shuffle_questions"/>
+    <result property="creatorId" column="creator_id"/>
+    <result property="status" column="status"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="myBestScore" column="my_best_score"/>
+  </resultMap>
+
+  <resultMap id="QuestionMap" type="com.edu.classroom.entity.ExamQuestion">
+    <id property="id" column="id"/>
+    <result property="paperId" column="paper_id"/>
+    <result property="qType" column="q_type"/>
+    <result property="stem" column="stem"/>
+    <result property="score" column="score"/>
+    <result property="sortNo" column="sort_no"/>
+    <result property="correctAnswer" column="correct_answer"/>
+    <result property="status" column="status"/>
+  </resultMap>
+
+  <resultMap id="AttemptMap" type="com.edu.classroom.entity.ExamAttempt">
+    <id property="id" column="id"/>
+    <result property="paperId" column="paper_id"/>
+    <result property="studentId" column="student_id"/>
+    <result property="startedAt" column="started_at"/>
+    <result property="submittedAt" column="submitted_at"/>
+    <result property="objectiveScore" column="objective_score"/>
+    <result property="totalScore" column="total_score"/>
+    <result property="status" column="status"/>
+  </resultMap>
+
+  <resultMap id="OptionDtoMap" type="com.edu.classroom.dto.exam.ExamPaperDetailResponse$Option">
+    <result property="questionId" column="question_id"/>
+    <result property="key" column="opt_key"/>
+    <result property="text" column="opt_text"/>
+  </resultMap>
+
+  <select id="genId" resultType="long">
+    select UUID_SHORT()
+  </select>
+
+  <insert id="insertPaper">
+    insert into exam_paper(
+      id, course_id, title, duration_minutes, start_at, end_at, shuffle_questions, creator_id, status, created_at
+    ) values (
+      #{id}, #{courseId}, #{title}, #{durationMinutes}, #{startAt}, #{endAt}, #{shuffleQuestions}, #{creatorId}, 0, now()
+    )
+  </insert>
+
+  <select id="listTeacherPapers" resultMap="PaperMap">
+    select p.*
+    from exam_paper p
+    join course c on c.id = p.course_id
+    where p.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+      and p.status in (0,1,2)
+    order by p.created_at desc
+  </select>
+
+  <select id="findPaperByTeacher" resultMap="PaperMap">
+    select p.*
+    from exam_paper p
+    join course c on c.id = p.course_id
+    where p.id = #{paperId}
+      and p.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+    limit 1
+  </select>
+
+  <update id="publishPaper">
+    update exam_paper p
+    join course c on c.id = p.course_id
+    set p.status = 1
+    where p.id = #{paperId}
+      and p.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+      and p.status = 0
+  </update>
+
+  <insert id="insertQuestion">
+    insert into exam_question(
+      id, paper_id, q_type, stem, score, sort_no, correct_answer, status
+    ) values (
+      #{id}, #{paperId}, #{qType}, #{stem}, #{score}, #{sortNo}, #{correctAnswer}, 1
+    )
+  </insert>
+
+  <insert id="insertOption">
+    insert into exam_option(
+      id, question_id, opt_key, opt_text, sort_no, status
+    ) values (
+      #{id}, #{questionId}, #{optKey}, #{optText}, #{sortNo}, 1
+    )
+  </insert>
+
+  <select id="listQuestionsByPaper" resultMap="QuestionMap">
+    select *
+    from exam_question
+    where paper_id = #{paperId}
+      and status = 1
+    order by sort_no asc, id asc
+  </select>
+
+  <select id="listQuestionsWithCorrectByPaper" resultMap="QuestionMap">
+    select *
+    from exam_question
+    where paper_id = #{paperId}
+      and status = 1
+    order by sort_no asc, id asc
+  </select>
+
+  <select id="listOptionsByPaper" resultMap="OptionDtoMap">
+    select o.question_id, o.opt_key, o.opt_text
+    from exam_option o
+    join exam_question q on q.id = o.question_id
+    where q.paper_id = #{paperId}
+      and q.status = 1
+      and o.status = 1
+    order by q.sort_no asc, o.sort_no asc, o.id asc
+  </select>
+
+  <select id="listStudentAvailablePapers" resultMap="PaperMap">
+    select p.*,
+      (select max(a.total_score) from exam_attempt a
+        where a.paper_id = p.id and a.student_id = #{studentId} and a.status = 2) as my_best_score
+    from exam_paper p
+    join course c on c.id = p.course_id
+    join course_member cm on cm.course_id = c.id
+    where p.course_id = #{courseId}
+      and p.status = 1
+      and c.status = 1
+      and cm.user_id = #{studentId}
+      and cm.member_role = 'STUDENT'
+      and cm.status = 1
+      and (p.start_at is null or p.start_at &lt;= now())
+      and (p.end_at is null or p.end_at &gt;= now())
+    order by p.created_at desc
+  </select>
+
+  <select id="findPaperForStudent" resultMap="PaperMap">
+    select p.*
+    from exam_paper p
+    join course c on c.id = p.course_id
+    join course_member cm on cm.course_id = c.id
+    where p.id = #{paperId}
+      and p.course_id = #{courseId}
+      and p.status = 1
+      and c.status = 1
+      and cm.user_id = #{studentId}
+      and cm.member_role = 'STUDENT'
+      and cm.status = 1
+    limit 1
+  </select>
+
+  <insert id="insertAttempt">
+    insert into exam_attempt(
+      id, paper_id, student_id, started_at, status
+    ) values (
+      #{id}, #{paperId}, #{studentId}, now(), 1
+    )
+  </insert>
+
+  <select id="findAttempt" resultMap="AttemptMap">
+    select *
+    from exam_attempt
+    where id = #{attemptId}
+      and student_id = #{studentId}
+    limit 1
+  </select>
+
+  <insert id="upsertAnswer">
+    insert into exam_answer(id, attempt_id, question_id, answer, score)
+    values (UUID_SHORT(), #{attemptId}, #{questionId}, #{answer}, #{score})
+    on duplicate key update answer = values(answer), score = values(score)
+  </insert>
+
+  <update id="submitAttempt">
+    update exam_attempt
+    set submitted_at = now(),
+        objective_score = #{objectiveScore},
+        total_score = #{totalScore},
+        status = 2
+    where id = #{attemptId}
+      and student_id = #{studentId}
+      and status = 1
+  </update>
+
+  <!-- 教师批改 -->
+  <resultMap id="TeacherExamAttemptListItemMap" type="com.edu.classroom.dto.exam.TeacherExamAttemptListItem">
+    <result property="attemptId" column="attempt_id"/>
+    <result property="studentId" column="student_id"/>
+    <result property="studentUsername" column="student_username"/>
+    <result property="studentName" column="student_name"/>
+    <result property="submittedAt" column="submitted_at"/>
+    <result property="totalScore" column="total_score"/>
+    <result property="objectiveScore" column="objective_score"/>
+  </resultMap>
+
+  <select id="listSubmittedAttemptsForTeacher" resultMap="TeacherExamAttemptListItemMap">
+    select a.id as attempt_id,
+           a.student_id,
+           u.username as student_username,
+           coalesce(nullif(trim(u.real_name), ''), u.username) as student_name,
+           a.submitted_at,
+           a.total_score,
+           a.objective_score
+    from exam_attempt a
+    join exam_paper p on p.id = a.paper_id
+    join course c on c.id = p.course_id
+    join sys_user u on u.id = a.student_id
+    where a.paper_id = #{paperId}
+      and p.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+      and a.status = 2
+    order by a.submitted_at desc, a.id desc
+  </select>
+
+  <select id="findAttemptForTeacher" resultMap="AttemptMap">
+    select a.*
+    from exam_attempt a
+    join exam_paper p on p.id = a.paper_id
+    join course c on c.id = p.course_id
+    where a.id = #{attemptId}
+      and a.paper_id = #{paperId}
+      and p.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+    limit 1
+  </select>
+
+  <resultMap id="TeacherExamGradingQuestionMap" type="com.edu.classroom.dto.exam.TeacherExamGradingQuestionDto">
+    <result property="questionId" column="question_id"/>
+    <result property="qType" column="q_type"/>
+    <result property="stem" column="stem"/>
+    <result property="fullScore" column="full_score"/>
+    <result property="correctAnswer" column="correct_answer"/>
+    <result property="studentAnswer" column="student_answer"/>
+    <result property="earnedScore" column="earned_score"/>
+  </resultMap>
+
+  <select id="listGradingQuestionsForAttempt" resultMap="TeacherExamGradingQuestionMap">
+    select q.id as question_id,
+           q.q_type,
+           q.stem,
+           q.score as full_score,
+           q.correct_answer,
+           ea.answer as student_answer,
+           ea.score as earned_score
+    from exam_question q
+    left join exam_answer ea on ea.question_id = q.id and ea.attempt_id = #{attemptId}
+    where q.paper_id = #{paperId}
+      and q.status = 1
+    order by q.sort_no asc, q.id asc
+  </select>
+
+  <select id="findAnswerText" resultType="string">
+    select ea.answer
+    from exam_answer ea
+    where ea.attempt_id = #{attemptId}
+      and ea.question_id = #{questionId}
+    limit 1
+  </select>
+
+  <update id="updateAnswerScoreForTeacher">
+    update exam_answer ea
+    inner join exam_attempt att on att.id = ea.attempt_id
+    inner join exam_paper p on p.id = att.paper_id
+    inner join course c on c.id = p.course_id
+    set ea.score = #{score}
+    where ea.attempt_id = #{attemptId}
+      and ea.question_id = #{questionId}
+      and att.paper_id = #{paperId}
+      and p.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and att.status = 2
+  </update>
+
+  <select id="sumAnswerScores" resultType="double">
+    select coalesce(sum(ea.score), 0)
+    from exam_answer ea
+    where ea.attempt_id = #{attemptId}
+  </select>
+
+  <select id="sumObjectiveAnswerScores" resultType="double">
+    select coalesce(sum(ea.score), 0)
+    from exam_answer ea
+    inner join exam_question q on q.id = ea.question_id
+    where ea.attempt_id = #{attemptId}
+      and q.q_type is not null
+      and q.q_type &lt;&gt; 5
+  </select>
+
+  <update id="updateAttemptTotalScores">
+    update exam_attempt att
+    inner join exam_paper p on p.id = att.paper_id
+    inner join course c on c.id = p.course_id
+    set att.total_score = #{totalScore},
+        att.objective_score = #{objectiveScore}
+    where att.id = #{attemptId}
+      and att.paper_id = #{paperId}
+      and p.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and att.status = 2
+  </update>
+
+  <!-- 试卷分析：每题正确率/得分率 -->
+  <resultMap id="TeacherExamQuestionAnalysisMap" type="com.edu.classroom.dto.exam.TeacherExamQuestionAnalysisDto">
+    <result property="questionId" column="question_id"/>
+    <result property="qType" column="q_type"/>
+    <result property="stem" column="stem"/>
+    <result property="fullScore" column="full_score"/>
+    <result property="participantCount" column="participant_count"/>
+    <result property="avgScore" column="avg_score"/>
+    <result property="correctCount" column="correct_count"/>
+  </resultMap>
+
+  <select id="listQuestionAnalysisByPaper" resultMap="TeacherExamQuestionAnalysisMap">
+    select q.id as question_id,
+           q.q_type,
+           q.stem,
+           q.score as full_score,
+           count(distinct att.id) as participant_count,
+           coalesce(avg(coalesce(ea.score, 0)), 0) as avg_score,
+           sum(
+             case
+               when q.q_type &lt;&gt; 5 and coalesce(ea.score, 0) &gt;= (q.score - 0.000001) then 1
+               else 0
+             end
+           ) as correct_count
+    from exam_question q
+    left join exam_attempt att on att.paper_id = q.paper_id and att.status = 2
+    left join exam_answer ea on ea.attempt_id = att.id and ea.question_id = q.id
+    where q.paper_id = #{paperId}
+      and q.status = 1
+    group by q.id, q.q_type, q.stem, q.score, q.sort_no
+    order by q.sort_no asc, q.id asc
+  </select>
+
+  <select id="countPublishedPapersByCourse" resultType="int">
+    select count(1)
+    from exam_paper
+    where course_id = #{courseId}
+      and status = 1
+  </select>
+
+  <select id="countCompletedExamPapersByCourseAndStudent" resultType="int">
+    select count(distinct a.paper_id)
+    from exam_attempt a
+    join exam_paper p on p.id = a.paper_id
+    where p.course_id = #{courseId}
+      and p.status = 1
+      and a.student_id = #{studentId}
+      and a.status = 2
+  </select>
+
+  <select id="avgBestExamScoreByCourseAndStudent" resultType="double">
+    select avg(t.best_score)
+    from (
+      select a.paper_id, max(a.total_score) as best_score
+      from exam_attempt a
+      join exam_paper p on p.id = a.paper_id
+      where p.course_id = #{courseId}
+        and p.status = 1
+        and a.student_id = #{studentId}
+        and a.status = 2
+      group by a.paper_id
+    ) t
+  </select>
+</mapper>
+

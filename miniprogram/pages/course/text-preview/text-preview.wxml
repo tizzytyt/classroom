@@ -1,0 +1,3 @@
+<scroll-view class="wrap" scroll-y style="height: 100vh;">
+  <text class="mono" selectable>{{content}}</text>
+</scroll-view>

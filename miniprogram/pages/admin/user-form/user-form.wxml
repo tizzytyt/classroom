@@ -1,0 +1,48 @@
+<view class="page">
+  <view class="card">
+    <view class="sectionTitle">{{mode === 'create' ? '新增用户' : '编辑用户'}}</view>
+
+    <view class="formItem">
+      <view class="formLabel">用户名</view>
+      <input class="input formInput" placeholder="请输入用户名" value="{{form.username}}" disabled="{{mode !== 'create'}}" bindinput="onField" data-field="username" />
+    </view>
+
+    <view wx:if="{{mode === 'create'}}" class="formItem">
+      <view class="formLabel">密码</view>
+      <input class="input formInput" placeholder="选填（默认123456）" password value="{{form.password}}" bindinput="onField" data-field="password" />
+    </view>
+
+    <view class="formItem">
+      <view class="formLabel">姓名</view>
+      <input class="input formInput" placeholder="请输入姓名" value="{{form.realName}}" bindinput="onField" data-field="realName" />
+    </view>
+
+    <view class="formItem">
+      <view class="formLabel">角色</view>
+      <picker mode="selector" range="{{roleOptions}}" value="{{roleIndex}}" bindchange="onRoleChange">
+        <view class="picker">{{roleOptions[roleIndex]}}</view>
+      </picker>
+    </view>
+
+    <view class="formItem">
+      <view class="formLabel">状态</view>
+      <picker mode="selector" range="{{statusOptions}}" value="{{statusIndex}}" bindchange="onStatusChange">
+        <view class="picker">{{statusOptions[statusIndex]}}</view>
+      </picker>
+    </view>
+
+    <view class="formItem">
+      <view class="formLabel">手机号</view>
+      <input class="input formInput" placeholder="可选" value="{{form.phone}}" bindinput="onField" data-field="phone" />
+    </view>
+
+    <view class="formItem">
+      <view class="formLabel">邮箱</view>
+      <input class="input formInput" placeholder="可选" value="{{form.email}}" bindinput="onField" data-field="email" />
+    </view>
+
+    <button class="btnPrimary saveBtn" loading="{{saving}}" disabled="{{saving}}" bindtap="submit">
+      {{saving ? '保存中...' : '保存'}}
+    </button>
+  </view>
+</view>

@@ -1,0 +1,93 @@
+.page {
+  padding: 24rpx;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.meta {
+  font-size: 26rpx;
+  color: #666666;
+  margin-top: 6rpx;
+}
+
+.sectionTitle {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.qItem {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.qItem:last-child {
+  border-bottom: none;
+}
+
+.qStem {
+  font-size: 28rpx;
+  line-height: 1.45;
+}
+
+.qMeta {
+  font-size: 24rpx;
+  color: #888888;
+  margin-top: 8rpx;
+}
+
+.answerBox {
+  font-size: 26rpx;
+  color: #333333;
+  margin-top: 12rpx;
+  padding: 12rpx;
+  background: #f7f8fa;
+  border-radius: 8rpx;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.rowScore {
+  display: flex;
+  align-items: center;
+  margin-top: 12rpx;
+}
+
+.scoreLabel {
+  font-size: 26rpx;
+  color: #666666;
+  width: 160rpx;
+}
+
+.scoreInput {
+  flex: 1;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  font-size: 28rpx;
+}
+
+.btnPrimary {
+  margin-top: 24rpx;
+  background: #1677ff;
+  color: #ffffff;
+  border-radius: 12rpx;
+}
+
+.tip {
+  font-size: 24rpx;
+  color: #888888;
+  margin-top: 12rpx;
+}

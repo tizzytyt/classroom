@@ -1,0 +1,41 @@
+<view class="page">
+  <view class="card headerCard">
+    <view class="headerTitle">超级管理员</view>
+    <view class="headerSub">{{displayName}}</view>
+  </view>
+
+  <view class="card">
+    <view class="sectionTitle">系统概览</view>
+    <view class="grid">
+      <view class="gridItem">
+        <view class="num">{{stats.usersTotal}}</view>
+        <view class="lbl">用户总数</view>
+      </view>
+      <view class="gridItem">
+        <view class="num">{{stats.usersActive}}</view>
+        <view class="lbl">启用用户</view>
+      </view>
+      <view class="gridItem">
+        <view class="num">{{stats.courses}}</view>
+        <view class="lbl">课程</view>
+      </view>
+      <view class="gridItem">
+        <view class="num">{{stats.assignments}}</view>
+        <view class="lbl">作业</view>
+      </view>
+      <view class="gridItem">
+        <view class="num">{{stats.resources}}</view>
+        <view class="lbl">资源</view>
+      </view>
+      <view class="gridItem">
+        <view class="num">{{stats.checkins}}</view>
+        <view class="lbl">签到</view>
+      </view>
+    </view>
+    <button class="btnPrimary actionBtn" bindtap="goUsers">用户账号管理</button>
+  </view>
+
+  <view class="card">
+    <button class="btnDanger actionBtn" bindtap="doLogout">退出登录</button>
+  </view>
+</view>

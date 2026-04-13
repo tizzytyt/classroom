@@ -1,0 +1,80 @@
+const { request } = require('../../../utils/request')
+const { getUser } = require('../../../utils/auth')
+
+function statusText(s) {
+  if (s === 1) return '已发布'
+  if (s === 2) return '已下线'
+  return '草稿'
+}
+
+Page({
+  data: {
+    courseId: '',
+    list: [],
+    loading: false,
+    isTeacher: false
+  },
+  onLoad(options) {
+    const cid = options.courseId != null ? String(options.courseId) : ''
+    if (!cid) {
+      wx.showToast({ title: '缺少课程ID', icon: 'none' })
+      return
+    }
+    const user = getUser()
+    const isTeacher = !!(user && user.roleCode === 'TEACHER')
+    this.setData({ courseId: cid, isTeacher })
+    wx.setNavigationBarTitle({ title: isTeacher ? '试卷与考试' : '课程考试' })
+    this.loadList()
+  },
+  onShow() {
+    if (this.data.courseId) this.loadList()
+  },
+  async loadList() {
+    if (!this.data.courseId) return
+    this.setData({ loading: true })
+    try {
+      const cid = this.data.courseId
+      const isTeacher = this.data.isTeacher
+      let raw = []
+      if (isTeacher) {
+        raw = await request(`/api/teacher/courses/${cid}/exams`, 'GET')
+      } else {
+        raw = await request(`/api/student/exams?courseId=${encodeURIComponent(cid)}`, 'GET')
+      }
+      raw = Array.isArray(raw) ? raw : []
+      const list = raw.map((x) => ({
+        ...x,
+        statusText: statusText(x.status),
+        // 大整数 id 必须以字符串参与路由，避免 setData/模板中变成不安全的 Number
+        id: x.id != null ? String(x.id) : ''
+      }))
+      this.setData({ list })
+    } catch (e) {
+      wx.showToast({ title: (e && e.message) ? e.message : '加载失败', icon: 'none' })
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
+  goCreateExam() {
+    if (!this.data.isTeacher || !this.data.courseId) return
+    wx.navigateTo({
+      url: `/pages/course/exam-create/exam-create?courseId=${encodeURIComponent(String(this.data.courseId))}`
+    })
+  },
+  openPaper(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+    wx.navigateTo({
+      url: `/pages/course/exam-detail/exam-detail?courseId=${encodeURIComponent(this.data.courseId)}&paperId=${encodeURIComponent(String(id))}`
+    })
+  },
+  goGradePaper(e) {
+    const id = e.currentTarget.dataset.id
+    const title = e.currentTarget.dataset.title ? String(e.currentTarget.dataset.title) : ''
+    if (!id) return
+    const q = title ? `&paperTitle=${encodeURIComponent(title)}` : ''
+    wx.navigateTo({
+      url: `/pages/course/exam-grading/exam-grading?courseId=${encodeURIComponent(this.data.courseId)}&paperId=${encodeURIComponent(String(id))}${q}`
+    })
+  }
+})

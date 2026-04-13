@@ -1,0 +1,69 @@
+<view class="page">
+  <view class="card" wx:if="{{!isTeacher}}">
+    <view class="title">课堂签到</view>
+    <view class="tip">请输入教师公布的 4～5 位数字签到码。</view>
+    <input class="input" type="number" maxlength="5" placeholder="例如 8421 或 48291" value="{{checkinCode}}" bindinput="onInput" />
+    <button class="btn" type="primary" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">点击签到</button>
+  </view>
+
+  <view class="card" wx:if="{{!isTeacher}}">
+    <view class="title">历史签到记录</view>
+    <view class="tip" wx:if="{{historyLoading}}">加载中...</view>
+    <view class="tip" wx:elif="{{!historyList.length}}">暂无签到记录</view>
+    <block wx:else>
+      <view wx:for="{{historyList}}" wx:key="id" class="item">
+        <view class="rowTop">
+          <view class="rowTitle">{{item.title || '—'}}</view>
+          <view class="badge {{item.checkedIn ? 'badgeOk' : 'badgeNo'}}">
+            {{item.checkedIn ? '已签到' : '未签到'}}
+          </view>
+        </view>
+        <view class="meta">开始：{{item.startAt || '—'}}</view>
+        <view class="meta">截止：{{item.endAt || '未设置'}}</view>
+        <view class="meta">状态：{{item.status === 1 ? '进行中' : '已结束'}}</view>
+      </view>
+    </block>
+  </view>
+
+  <view class="card" wx:if="{{isTeacher}}">
+    <view class="title">创建签到活动</view>
+    <view class="sectionSub">填写签到标题；可选截止时间，用下方开关与日期、时间选择器设置（与试卷开放结束时间一致）。不设置截止则需教师手动结束活动。创建后生成 4～5 位数字签到码。</view>
+    <input class="input" placeholder="签到标题" value="{{createForm.title}}" bindinput="onCreateTitleInput" />
+    <view class="deadlineSwitchRow">
+      <text class="deadlineSwitchLabel">设置签到截止时间</text>
+      <switch checked="{{hasEndDeadline}}" bindchange="onEndDeadlineChange" color="#4b7cff" />
+    </view>
+    <view class="timeBlock" wx:if="{{hasEndDeadline}}">
+      <view class="timeLabel">截止时间</view>
+      <view class="timeRow">
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="pickerCell">日期 {{endDate}}</view>
+        </picker>
+        <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+          <view class="pickerCell">时间 {{endTime}}</view>
+        </picker>
+      </view>
+    </view>
+    <button class="btn" type="primary" loading="{{creating}}" disabled="{{creating}}" bindtap="createCheckin">创建签到</button>
+  </view>
+
+  <view class="card" wx:if="{{isTeacher}}">
+    <view class="title">签到活动列表</view>
+    <view class="tip" wx:if="{{loadingList}}">加载中...</view>
+    <view class="tip" wx:elif="{{!checkins.length}}">暂无签到活动</view>
+    <block wx:else>
+      <view wx:for="{{checkins}}" wx:key="id" class="item">
+        <view class="meta">签到码：{{item.checkinCode || '—'}}（历史活动可能无短码）</view>
+        <view class="meta">标题：{{item.title}}</view>
+        <view class="meta">开始：{{item.startAt}}</view>
+        <view class="meta">截止：{{item.endAt || '未设置'}}</view>
+        <view class="meta">状态：{{item.status === 1 ? '进行中' : '已结束'}}</view>
+        <view class="btnRow">
+          <button size="mini" class="btnMini" data-id="{{item.id}}" bindtap="goStatsPage">出勤情况</button>
+          <button wx:if="{{item.status === 1}}" size="mini" class="btnMiniDanger" data-id="{{item.id}}" bindtap="closeCheckin">结束</button>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+

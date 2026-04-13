@@ -1,0 +1,123 @@
+.page {
+  padding: 24rpx;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.input {
+  width: 100%;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 12rpx;
+  border: 1px solid #e5e5e5;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+  font-size: 28rpx;
+}
+
+.inputTop {
+  margin-top: 12rpx;
+}
+
+.sectionTitle {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.sectionSub {
+  font-size: 24rpx;
+  color: #888888;
+  margin-bottom: 16rpx;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 160rpx;
+  border-radius: 12rpx;
+  border: 1px solid #e5e5e5;
+  padding: 16rpx;
+  box-sizing: border-box;
+  font-size: 26rpx;
+  margin-top: 12rpx;
+}
+
+.timeBlock {
+  margin-bottom: 20rpx;
+}
+
+.timeLabel {
+  font-size: 26rpx;
+  color: #333333;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.timeRow {
+  display: flex;
+  gap: 16rpx;
+}
+
+.pickerCell {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  padding: 0 20rpx;
+  border-radius: 12rpx;
+  border: 1px solid #e5e5e5;
+  font-size: 26rpx;
+  color: #333333;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.attachmentBlock {
+  margin-top: 8rpx;
+  margin-bottom: 8rpx;
+}
+
+.btnUpload {
+  margin-top: 12rpx;
+  width: 100%;
+}
+
+.attachmentRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 16rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  background: #f7f8fa;
+  border: 1px solid #e8e8e8;
+}
+
+.attachmentName {
+  flex: 1;
+  font-size: 26rpx;
+  color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachmentRemove {
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: #4b7cff;
+}
+
+.btnPrimary {
+  margin-top: 16rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #4b7cff 0%, #6fa4ff 100%);
+  color: #ffffff;
+  border: none;
+}
+
