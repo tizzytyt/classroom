@@ -205,6 +205,7 @@
     <result property="submittedAt" column="submitted_at"/>
     <result property="totalScore" column="total_score"/>
     <result property="objectiveScore" column="objective_score"/>
+    <result property="graded" column="graded"/>
   </resultMap>
 
   <select id="listSubmittedAttemptsForTeacher" resultMap="TeacherExamAttemptListItemMap">
@@ -214,7 +215,19 @@
            coalesce(nullif(trim(u.real_name), ''), u.username) as student_name,
            a.submitted_at,
            a.total_score,
-           a.objective_score
+           a.objective_score,
+           case
+             when not exists (
+               select 1
+               from exam_question q
+               left join exam_answer ea2 on ea2.attempt_id = a.id and ea2.question_id = q.id
+               where q.paper_id = a.paper_id
+                 and q.status = 1
+                 and q.q_type = 5
+                 and (ea2.id is null or ea2.score is null)
+             ) then 1
+             else 0
+           end as graded
     from exam_attempt a
     join exam_paper p on p.id = a.paper_id
     join course c on c.id = p.course_id
@@ -377,6 +390,35 @@
         and a.status = 2
       group by a.paper_id
     ) t
+  </select>
+
+  <select id="bestSubmittedScoreByPaperAndStudent" resultType="double">
+    select max(a.total_score)
+    from exam_attempt a
+    where a.paper_id = #{paperId}
+      and a.student_id = #{studentId}
+      and a.status = 2
+  </select>
+
+  <select id="countPendingSubjectiveAttemptsByPaper" resultType="int">
+    select count(distinct a.id)
+    from exam_attempt a
+    join exam_paper p on p.id = a.paper_id
+    join course c on c.id = p.course_id
+    where a.paper_id = #{paperId}
+      and p.course_id = #{courseId}
+      and c.teacher_id = #{teacherId}
+      and c.status = 1
+      and a.status = 2
+      and exists (
+        select 1
+        from exam_question q
+        left join exam_answer ea on ea.attempt_id = a.id and ea.question_id = q.id
+        where q.paper_id = a.paper_id
+          and q.status = 1
+          and q.q_type = 5
+          and (ea.id is null or ea.score is null)
+      )
   </select>
 </mapper>
 

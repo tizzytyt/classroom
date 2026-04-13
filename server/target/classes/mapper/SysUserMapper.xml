@@ -94,11 +94,8 @@
     where id = #{id}
   </update>
 
-  <update id="softDelete">
-    update sys_user
-    set status = 0,
-        username = concat(username, '_deleted_', id),
-        updated_at = now()
+  <delete id="hardDelete">
+    delete from sys_user
     where id = #{id}
-  </update>
+  </delete>
 </mapper>

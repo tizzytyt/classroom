@@ -16,6 +16,7 @@ public class TeacherExamAttemptListItem {
   private LocalDateTime submittedAt;
   private Double totalScore;
   private Double objectiveScore;
+  private Boolean graded;
 
   public Long getAttemptId() { return attemptId; }
   public void setAttemptId(Long attemptId) { this.attemptId = attemptId; }
@@ -31,4 +32,6 @@ public class TeacherExamAttemptListItem {
   public void setTotalScore(Double totalScore) { this.totalScore = totalScore; }
   public Double getObjectiveScore() { return objectiveScore; }
   public void setObjectiveScore(Double objectiveScore) { this.objectiveScore = objectiveScore; }
+  public Boolean getGraded() { return graded; }
+  public void setGraded(Boolean graded) { this.graded = graded; }
 }

@@ -342,6 +342,14 @@ public class TeacherController {
     return ResponseEntity.ok(teacherService.listExamPapers(uid, courseId));
   }
 
+  @GetMapping("/courses/{courseId}/exams/pending-grading-counts")
+  public ResponseEntity<?> pendingGradingCounts(@RequestAttribute("uid") Long uid,
+                                                @RequestAttribute("role") Object role,
+                                                @PathVariable Long courseId) {
+    if (!isTeacher(role)) return forbidden();
+    return ResponseEntity.ok(teacherService.pendingGradingCounts(uid, courseId));
+  }
+
   @GetMapping("/courses/{courseId}/exams/{paperId}")
   public ResponseEntity<?> examPaperDetail(@RequestAttribute("uid") Long uid,
                                            @RequestAttribute("role") Object role,

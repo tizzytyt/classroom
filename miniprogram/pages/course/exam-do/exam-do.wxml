@@ -45,7 +45,17 @@
     </block>
 
     <block wx:elif="{{q.qType === 5}}">
-      <textarea class="textarea" placeholder="简答题" value="{{answerText}}" bindinput="onTextInput" />
+      <textarea wx:if="{{saAllowText}}" class="textarea" placeholder="简答题（文本）" value="{{answerText}}" bindinput="onTextInput" />
+      <view class="saOps">
+        <button size="mini" wx:if="{{saAllowImage}}" bindtap="chooseSaImage" loading="{{saUploading}}" disabled="{{saUploading}}">上传图片</button>
+        <button size="mini" wx:if="{{saAllowFile}}" bindtap="chooseSaFile" loading="{{saUploading}}" disabled="{{saUploading}}">上传文件</button>
+      </view>
+      <view wx:if="{{answerSaFiles.length}}" class="saList">
+        <view wx:for="{{answerSaFiles}}" wx:key="fileUrl" class="saItem">
+          <text class="saName">{{item.fileName || '附件'}}</text>
+          <text class="saRemove" data-url="{{item.fileUrl}}" bindtap="removeSaFile">删除</text>
+        </view>
+      </view>
     </block>
 
     <block wx:else>

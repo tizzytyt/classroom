@@ -27,6 +27,8 @@ public class StudentLearningMonitorDto {
   private Integer totalCheckins;
   private Integer checkedInCount;
   private Double attendanceRate;
+  /** 按课程权重计算得到的最终成绩（0-100） */
+  private Double finalScore;
 
   private String riskLevel; // LOW/MEDIUM/HIGH
 
@@ -62,6 +64,8 @@ public class StudentLearningMonitorDto {
   public void setCheckedInCount(Integer checkedInCount) { this.checkedInCount = checkedInCount; }
   public Double getAttendanceRate() { return attendanceRate; }
   public void setAttendanceRate(Double attendanceRate) { this.attendanceRate = attendanceRate; }
+  public Double getFinalScore() { return finalScore; }
+  public void setFinalScore(Double finalScore) { this.finalScore = finalScore; }
   public String getRiskLevel() { return riskLevel; }
   public void setRiskLevel(String riskLevel) { this.riskLevel = riskLevel; }
 }

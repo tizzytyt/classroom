@@ -32,6 +32,7 @@ function defaultEndPicker() {
 Page({
   data: {
     courseId: null,
+    courseName: '',
     checkinCode: '',
     submitting: false,
     user: null,
@@ -49,6 +50,39 @@ Page({
     loadingList: false,
     checkins: []
   },
+  normalizeDateTime(v) {
+    if (!v) return null
+    if (v instanceof Date) return Number.isNaN(v.getTime()) ? null : v
+    const s = String(v).trim()
+    if (!s) return null
+    const d = new Date(s.replace('T', ' ').replace(/-/g, '/'))
+    return Number.isNaN(d.getTime()) ? null : d
+  },
+  isCheckinActive(item) {
+    if (!item || Number(item.status) !== 1) return false
+    const end = this.normalizeDateTime(item.endAt)
+    if (end && end.getTime() <= Date.now()) return false
+    return true
+  },
+  withComputedStatus(list) {
+    return (Array.isArray(list) ? list : []).map((item) => {
+      const active = this.isCheckinActive(item)
+      return Object.assign({}, item, {
+        active,
+        statusText: active ? '进行中' : '已结束'
+      })
+    })
+  },
+  async loadCourseName() {
+    if (!this.data.courseId) return
+    const path = this.data.isTeacher
+      ? `/api/teacher/courses/${encodeURIComponent(String(this.data.courseId))}`
+      : `/api/student/courses/${encodeURIComponent(String(this.data.courseId))}`
+    try {
+      const course = await request(path, 'GET')
+      this.setData({ courseName: (course && course.name) ? course.name : '' })
+    } catch (e) {}
+  },
   resetEndPicker() {
     const r = defaultEndPicker()
     this.setData({ endDate: r.endDate, endTime: r.endTime })
@@ -58,6 +92,7 @@ Page({
     const user = getUser()
     const isTeacher = !!(user && user.roleCode === 'TEACHER')
     this.setData({ courseId: cid, user, isTeacher })
+    this.loadCourseName()
     if (isTeacher && cid) {
       this.resetEndPicker()
       this.loadCheckins()
@@ -105,7 +140,7 @@ Page({
     this.setData({ historyLoading: true })
     try {
       const list = await request(`/api/student/checkins?courseId=${encodeURIComponent(String(this.data.courseId))}`, 'GET')
-      this.setData({ historyList: Array.isArray(list) ? list : [] })
+      this.setData({ historyList: this.withComputedStatus(list) })
     } catch (e) {
       wx.showToast({ title: (e && e.message) ? e.message : '加载签到记录失败', icon: 'none' })
     } finally {
@@ -164,7 +199,7 @@ Page({
     this.setData({ loadingList: true })
     try {
       const list = await request(`/api/teacher/courses/${this.data.courseId}/checkins`, 'GET')
-      this.setData({ checkins: Array.isArray(list) ? list : [] })
+      this.setData({ checkins: this.withComputedStatus(list) })
     } catch (e) {
       wx.showToast({ title: (e && e.message) ? e.message : '加载签到列表失败', icon: 'none' })
     } finally {
@@ -183,6 +218,16 @@ Page({
         if (!res.confirm) return
         try {
           await request(`/api/teacher/courses/${this.data.courseId}/checkins/${id}/close`, 'POST', {})
+          const sid = String(id)
+          const next = (this.data.checkins || []).map((item) => {
+            if (String(item.id) !== sid) return item
+            return Object.assign({}, item, {
+              status: 0,
+              active: false,
+              statusText: '已结束'
+            })
+          })
+          this.setData({ checkins: next })
           wx.showToast({ title: '已结束', icon: 'success' })
           await this.loadCheckins()
         } catch (err) {

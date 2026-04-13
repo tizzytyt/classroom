@@ -9,6 +9,7 @@
   <view class="card" wx:if="{{rows.length}}">
     <view class="sectionTitle">逐题得分</view>
     <view class="tip">得分不能超过该题满分；保存后自动重算总分与客观题合计。</view>
+    <view wx:if="{{gradingDone}}" class="gradedTip">已批改</view>
     <block wx:for="{{rows}}" wx:key="questionId">
       <view class="qItem">
         <view class="qStem">{{index + 1}}. {{item.stem}}</view>
@@ -16,11 +17,12 @@
         <view class="meta" style="margin-top:8rpx">学生作答</view>
         <view class="answerBox">{{item.studentAnswer || '（未作答）'}}</view>
         <view class="rowScore">
-          <text class="scoreLabel">本题得分</text>
-          <input class="scoreInput" type="digit" value="{{item.scoreInput}}" data-idx="{{index}}" bindinput="onScoreInput" />
+          <text class="scoreLabel">{{item.gradable ? '本题得分（教师批改）' : '本题得分（系统判分）'}}</text>
+          <input wx:if="{{item.gradable}}" class="scoreInput" type="digit" value="{{item.scoreInput}}" data-idx="{{index}}" bindinput="onScoreInput" />
+          <view wx:else class="scoreReadonly">{{item.earnedScore != null ? item.earnedScore : '—'}}</view>
         </view>
       </view>
     </block>
-    <button class="btnPrimary" loading="{{saving}}" disabled="{{saving}}" bindtap="saveGrades">保存得分</button>
+    <button wx:if="{{!gradingDone}}" class="btnPrimary" loading="{{saving}}" disabled="{{saving}}" bindtap="saveGrades">保存得分</button>
   </view>
 </view>

@@ -27,5 +27,5 @@ public interface SysUserMapper {
   int updateRole(@Param("id") Long id, @Param("roleCode") String roleCode);
   int updateStatus(@Param("id") Long id, @Param("status") Integer status);
   int updatePasswordHash(@Param("id") Long id, @Param("passwordHash") String passwordHash);
-  int softDelete(@Param("id") Long id);
+  int hardDelete(@Param("id") Long id);
 }

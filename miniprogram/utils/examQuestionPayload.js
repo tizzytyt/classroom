@@ -59,6 +59,30 @@ function buildPayloadFromNewQ(n) {
     }
   }
 
+  if (n.qType === 5) {
+    const allowText = n.allowText !== false
+    const allowImage = !!n.allowImage
+    const allowFile = !!n.allowFile
+    if (!allowText && !allowImage && !allowFile) {
+      return { ok: false, msg: '请至少启用一种简答题作答方式' }
+    }
+    const options = []
+    if (allowText) options.push({ key: 'TEXT', text: '允许文本作答' })
+    if (allowImage) options.push({ key: 'IMAGE', text: '允许上传图片' })
+    if (allowFile) options.push({ key: 'FILE', text: '允许上传文件' })
+    return {
+      ok: true,
+      payload: {
+        qType: 5,
+        stem,
+        score,
+        sortNo: sn,
+        correctAnswer: null,
+        options
+      }
+    }
+  }
+
   return { ok: false, msg: '题型错误' }
 }
 
@@ -70,12 +94,24 @@ function qTypeLabel(t) {
 /** 从已保存的 payload 回填编辑表单 */
 function payloadToNewQ(payload, defaults) {
   const p = payload || {}
+  let allowText = true
+  let allowImage = false
+  let allowFile = false
+  if (p.qType === 5 && Array.isArray(p.options) && p.options.length) {
+    const keys = p.options.map((o) => String(o && o.key ? o.key : '').toUpperCase())
+    allowText = keys.includes('TEXT')
+    allowImage = keys.includes('IMAGE')
+    allowFile = keys.includes('FILE')
+  }
   const base = {
-    qType: p.qType === 3 ? 3 : 1,
+    qType: p.qType === 3 ? 3 : (p.qType === 5 ? 5 : 1),
     stem: p.stem || '',
     score: String(p.score != null ? p.score : (defaults && defaults.score) || '5'),
     sortNo: String(p.sortNo != null ? p.sortNo : (defaults && defaults.sortNo) || '1'),
     correctAnswer: p.correctAnswer || 'A',
+    allowText,
+    allowImage,
+    allowFile,
     optA: '',
     optB: '',
     optC: '',

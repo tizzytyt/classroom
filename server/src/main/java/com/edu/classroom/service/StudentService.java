@@ -158,6 +158,33 @@ public class StudentService {
     }
   }
 
+  public Map<String, Object> uploadExamAnswerFile(Long paperId, Long courseId, Long studentId, MultipartFile file, String clientOriginalName) {
+    if (paperId == null || courseId == null) throw new RuntimeException("参数错误");
+    if (examMapper.findPaperForStudent(studentId, courseId, paperId) == null) throw new RuntimeException("试卷不存在或无权限");
+    if (file == null || file.isEmpty()) throw new RuntimeException("请选择文件");
+    if (file.getSize() > MAX_ASSIGNMENT_UPLOAD) throw new RuntimeException("文件不能超过500MB");
+    String originalName = StringUtils.hasText(clientOriginalName) ? clientOriginalName.trim() : file.getOriginalFilename();
+    if (!StringUtils.hasText(originalName)) throw new RuntimeException("文件名无效");
+    String safeName = sanitizeFileName(originalName);
+    String ext = getExtension(safeName);
+    String contentType = file.getContentType() == null ? "" : file.getContentType().toLowerCase();
+    String storedName = UUID.randomUUID().toString().replace("-", "") + (ext.isEmpty() ? "" : ("." + ext));
+    try {
+      Path dirPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+      Files.createDirectories(dirPath);
+      Path target = dirPath.resolve(storedName);
+      Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+      Map<String, Object> m = new HashMap<>();
+      m.put("fileUrl", "/api/files/" + storedName);
+      m.put("fileName", safeName);
+      m.put("fileSize", file.getSize());
+      m.put("fileType", StringUtils.hasText(contentType) ? contentType : (ext.isEmpty() ? "application/octet-stream" : ext));
+      return m;
+    } catch (Exception e) {
+      throw new RuntimeException("文件上传失败，请重试");
+    }
+  }
+
   public void submitAssignment(Long assignmentId, Long studentId, StudentAssignmentSubmitRequest req) {
     if (req == null) {
       req = new StudentAssignmentSubmitRequest();
@@ -276,13 +303,13 @@ public class StudentService {
     double assignmentScore = totalAssignments <= 0 ? 0.0 : (submittedAssignments * 100.0 / totalAssignments);
     double resourceScore = totalResources <= 0 ? 0.0 : (completedResources * 100.0 / totalResources);
     double checkinScore = totalCheckins <= 0 ? 0.0 : (checkedInCount * 100.0 / totalCheckins);
-    double examScore = examAvg == null ? 0.0 : examAvg;
+    Double examScore = examAvg == null ? null : round2(examAvg);
 
     double aw = rule.getAssignmentWeight() == null ? 0.0 : rule.getAssignmentWeight();
     double cw = rule.getCheckinWeight() == null ? 0.0 : rule.getCheckinWeight();
     double rw = rule.getResourceWeight() == null ? 0.0 : rule.getResourceWeight();
     double ew = rule.getExamWeight() == null ? 0.0 : rule.getExamWeight();
-    double finalScore = assignmentScore * aw + checkinScore * cw + resourceScore * rw + examScore * ew;
+    double finalScore = assignmentScore * aw + checkinScore * cw + resourceScore * rw + (examScore == null ? 0.0 : examScore) * ew;
 
     CourseFinalGrade g = new CourseFinalGrade();
     g.setCourseId(courseId);
@@ -290,7 +317,7 @@ public class StudentService {
     g.setAssignmentScore(round2(assignmentScore));
     g.setCheckinScore(round2(checkinScore));
     g.setResourceScore(round2(resourceScore));
-    g.setExamScore(round2(examScore));
+    g.setExamScore(examScore);
     g.setFinalScore(round2(finalScore));
     g.setCalculatedAt(LocalDateTime.now());
     return g;
@@ -348,6 +375,9 @@ public class StudentService {
     resp.setEndAt(paper.getEndAt());
     resp.setStatus(paper.getStatus());
     resp.setShuffleQuestions(paper.getShuffleQuestions());
+    Double myBestScore = examMapper.bestSubmittedScoreByPaperAndStudent(paperId, studentId);
+    resp.setSubmitted(myBestScore != null);
+    resp.setMyBestScore(myBestScore);
     resp.setQuestions(qResp);
     return resp;
   }
@@ -359,6 +389,9 @@ public class StudentService {
     LocalDateTime now = LocalDateTime.now();
     if (paper.getStartAt() != null && now.isBefore(paper.getStartAt())) throw new RuntimeException("试卷未开始");
     if (paper.getEndAt() != null && now.isAfter(paper.getEndAt())) throw new RuntimeException("试卷已结束");
+    if (examMapper.bestSubmittedScoreByPaperAndStudent(paperId, studentId) != null) {
+      throw new RuntimeException("该试卷已完成，禁止重复提交");
+    }
 
     Long attemptId = examMapper.genId();
     int rows = examMapper.insertAttempt(attemptId, paperId, studentId);

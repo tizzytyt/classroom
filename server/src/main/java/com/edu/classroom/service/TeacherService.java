@@ -650,6 +650,20 @@ public class TeacherService {
     return examMapper.listTeacherPapers(teacherId, courseId);
   }
 
+  public Map<Long, Integer> pendingGradingCounts(Long teacherId, Long courseId) {
+    Course course = courseMapper.findByIdAndTeacher(courseId, teacherId);
+    if (course == null) throw new RuntimeException("课程不存在或无权限");
+    List<com.edu.classroom.entity.ExamPaper> papers = examMapper.listTeacherPapers(teacherId, courseId);
+    Map<Long, Integer> map = new HashMap<>();
+    if (papers == null || papers.isEmpty()) return map;
+    for (com.edu.classroom.entity.ExamPaper p : papers) {
+      if (p == null || p.getId() == null) continue;
+      Integer cnt = examMapper.countPendingSubjectiveAttemptsByPaper(teacherId, courseId, p.getId());
+      map.put(p.getId(), cnt == null ? 0 : cnt);
+    }
+    return map;
+  }
+
   public void publishExamPaper(Long teacherId, Long courseId, Long paperId) {
     Course course = courseMapper.findByIdAndTeacher(courseId, teacherId);
     if (course == null) throw new RuntimeException("课程不存在或无权限");
@@ -921,7 +935,9 @@ public class TeacherService {
     List<TeacherExamGradingQuestionDto> qs = examMapper.listGradingQuestionsForAttempt(paperId, attemptId);
     if (qs != null) {
       for (TeacherExamGradingQuestionDto q : qs) {
-        q.setGradable(true);
+        Integer qt = q.getQType();
+        // 仅主观题（简答题）需要教师批改；客观题为系统判分
+        q.setGradable(qt != null && qt == 5);
       }
     }
     TeacherExamAttemptGradingResponse resp = new TeacherExamAttemptGradingResponse();
@@ -960,6 +976,10 @@ public class TeacherService {
       if (it == null || it.getQuestionId() == null) continue;
       com.edu.classroom.entity.ExamQuestion def = qMap.get(it.getQuestionId());
       if (def == null) throw new RuntimeException("题目不存在或不属于该试卷");
+      Integer qt = def.getQType();
+      if (qt == null || qt != 5) {
+        throw new RuntimeException("客观题由系统自动判分，无需教师批改");
+      }
       double full = def.getScore() == null ? 0.0 : def.getScore();
       double sc = it.getScore() == null ? 0.0 : it.getScore();
       if (sc < 0 || sc > full + 1e-6) {
@@ -1108,7 +1128,65 @@ public class TeacherService {
     Course course = courseMapper.findByIdAndTeacher(courseId, teacherId);
     if (course == null) throw new RuntimeException("课程不存在或无权限");
     List<TeacherStudentGradeItem> list = gradeMapper.listStudentGradesForCourse(teacherId, courseId);
-    return list == null ? List.of() : list;
+    if (list == null || list.isEmpty()) return List.of();
+
+    CourseGradeRule rule = courseGradeRuleMapper.findByCourseId(courseId);
+    double aw = rule == null || rule.getAssignmentWeight() == null ? DEF_ASSIGN_W : rule.getAssignmentWeight();
+    double cw = rule == null || rule.getCheckinWeight() == null ? DEF_CHECKIN_W : rule.getCheckinWeight();
+    double rw = rule == null || rule.getResourceWeight() == null ? DEF_RESOURCE_W : rule.getResourceWeight();
+    double ew = rule == null || rule.getExamWeight() == null ? DEF_EXAM_W : rule.getExamWeight();
+
+    int totalAssignments = assignmentMapper.countAssignmentsByCourse(courseId) == null ? 0 : assignmentMapper.countAssignmentsByCourse(courseId);
+    int totalResources = resourceMapper.countResourcesByCourse(courseId) == null ? 0 : resourceMapper.countResourcesByCourse(courseId);
+    int totalCheckins = checkinMapper.countCheckinsByCourse(courseId) == null ? 0 : checkinMapper.countCheckinsByCourse(courseId);
+
+    for (TeacherStudentGradeItem item : list) {
+      if (item == null || item.getStudentId() == null) continue;
+      Long studentId = item.getStudentId();
+
+      // course_final_grade 尚未生成时，按实时学习进度给出可展示成绩，避免教师端明细全为空
+      if (item.getAssignmentScore() == null) {
+        int submittedAssignments = assignmentMapper.countSubmittedAssignmentsByCourseAndStudent(courseId, studentId) == null
+          ? 0 : assignmentMapper.countSubmittedAssignmentsByCourseAndStudent(courseId, studentId);
+        double assignmentScore = totalAssignments <= 0 ? 0.0 : (submittedAssignments * 100.0 / totalAssignments);
+        item.setAssignmentScore(round2(assignmentScore));
+      }
+      if (item.getResourceScore() == null) {
+        int completedResources = learningProgressMapper.countCompletedResources(courseId, studentId) == null
+          ? 0 : learningProgressMapper.countCompletedResources(courseId, studentId);
+        double resourceScore = totalResources <= 0 ? 0.0 : (completedResources * 100.0 / totalResources);
+        item.setResourceScore(round2(resourceScore));
+      }
+      if (item.getCheckinScore() == null) {
+        int checkedInCount = checkinMapper.countRecordsByCourseAndStudent(courseId, studentId) == null
+          ? 0 : checkinMapper.countRecordsByCourseAndStudent(courseId, studentId);
+        double checkinScore = totalCheckins <= 0 ? 0.0 : (checkedInCount * 100.0 / totalCheckins);
+        item.setCheckinScore(round2(checkinScore));
+      }
+      if (item.getExamScore() == null) {
+        Double examAvg = examMapper.avgBestExamScoreByCourseAndStudent(courseId, studentId);
+        if (examAvg != null) {
+          item.setExamScore(round2(examAvg));
+        }
+      }
+
+      if (item.getFinalScore() == null) {
+        double finalScore = safe(item.getAssignmentScore()) * aw
+          + safe(item.getCheckinScore()) * cw
+          + safe(item.getResourceScore()) * rw
+          + safe(item.getExamScore()) * ew;
+        item.setFinalScore(round2(finalScore));
+      }
+    }
+    return list;
+  }
+
+  private static double safe(Double v) {
+    return v == null ? 0.0 : v;
+  }
+
+  private static double round2(double n) {
+    return Math.round(n * 100.0) / 100.0;
   }
 
   public List<HomeworkCompletionStatsResponse> homeworkCompletionStats(Long teacherId, Long courseId) {
@@ -1176,6 +1254,11 @@ public class TeacherService {
     int totalAssignments = assignmentMapper.countAssignmentsByCourse(courseId) == null ? 0 : assignmentMapper.countAssignmentsByCourse(courseId);
     int totalExams = examMapper.countPublishedPapersByCourse(courseId) == null ? 0 : examMapper.countPublishedPapersByCourse(courseId);
     int totalCheckins = checkinMapper.countCheckinsByCourse(courseId) == null ? 0 : checkinMapper.countCheckinsByCourse(courseId);
+    CourseGradeRule rule = courseGradeRuleMapper.findByCourseId(courseId);
+    double aw = rule == null || rule.getAssignmentWeight() == null ? DEF_ASSIGN_W : rule.getAssignmentWeight();
+    double cw = rule == null || rule.getCheckinWeight() == null ? DEF_CHECKIN_W : rule.getCheckinWeight();
+    double rw = rule == null || rule.getResourceWeight() == null ? DEF_RESOURCE_W : rule.getResourceWeight();
+    double ew = rule == null || rule.getExamWeight() == null ? DEF_EXAM_W : rule.getExamWeight();
 
     List<StudentLearningMonitorDto> list = new ArrayList<>();
     for (SysUser s : students) {
@@ -1191,8 +1274,14 @@ public class TeacherService {
       double hwRate = (totalAssignments <= 0) ? 0.0 : (double) submittedAssignments / totalAssignments;
       double examRate = (totalExams <= 0) ? 0.0 : (double) completedExams / totalExams;
       double attRate = (totalCheckins <= 0) ? 0.0 : (double) checkedIn / totalCheckins;
+      Double examAvg = examMapper.avgBestExamScoreByCourseAndStudent(courseId, sid);
+      double assignmentScore = hwRate * 100.0;
+      double checkinScore = attRate * 100.0;
+      double resourceScore = resRate * 100.0;
+      double examScore = examAvg == null ? 0.0 : examAvg;
+      double finalScore = assignmentScore * aw + checkinScore * cw + resourceScore * rw + examScore * ew;
 
-      String risk = calcRisk(resRate, hwRate, examRate, attRate);
+      String risk = calcRisk(finalScore);
 
       StudentLearningMonitorDto dto = new StudentLearningMonitorDto();
       dto.setStudentId(sid);
@@ -1209,6 +1298,7 @@ public class TeacherService {
       dto.setTotalCheckins(totalCheckins);
       dto.setCheckedInCount(checkedIn);
       dto.setAttendanceRate(attRate);
+      dto.setFinalScore(round2(finalScore));
       dto.setRiskLevel(risk);
       list.add(dto);
     }
@@ -1265,9 +1355,8 @@ public class TeacherService {
     return 1;
   }
 
-  private String calcRisk(double resRate, double hwRate, double examRate, double attRate) {
-    // 四项完成率平均后换算为 0-100 的最终分
-    double finalScore = (resRate + hwRate + examRate + attRate) / 4.0 * 100.0;
+  private String calcRisk(double finalScore) {
+    // 按课程成绩权重计算得到的最终成绩判断风险
     if (finalScore < 60.0) return "HIGH";
     return "LOW";
   }

@@ -8,7 +8,8 @@ Page({
     attemptId: '',
     detail: null,
     rows: [],
-    saving: false
+    saving: false,
+    gradingDone: false
   },
   onLoad(options) {
     const cid = options.courseId != null ? String(options.courseId) : ''
@@ -32,7 +33,9 @@ Page({
           ? String(q.earnedScore)
           : ''
     }))
-    this.setData({ detail: d || null, rows })
+    const gradableRows = rows.filter((r) => !!r.gradable)
+    const gradingDone = gradableRows.length > 0 && gradableRows.every((r) => r.earnedScore != null)
+    this.setData({ detail: d || null, rows, gradingDone })
   },
   async loadDetail() {
     try {
@@ -54,6 +57,7 @@ Page({
     const rows = this.data.rows || []
     const items = []
     for (const r of rows) {
+      if (!r.gradable) continue
       const qid = r.questionId
       if (!qid) continue
       const raw = (r.scoreInput || '').trim()
@@ -65,7 +69,7 @@ Page({
       items.push({ questionId: qid, score: sc })
     }
     if (!items.length) {
-      wx.showToast({ title: '没有可保存的题目', icon: 'none' })
+      wx.showToast({ title: '当前答卷无主观题可批改', icon: 'none' })
       return
     }
     this.setData({ saving: true })

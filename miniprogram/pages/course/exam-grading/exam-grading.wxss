@@ -41,3 +41,16 @@
   font-size: 28rpx;
   font-weight: 500;
 }
+
+.rowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.gradedTag {
+  font-size: 24rpx;
+  color: #ff4d4f;
+  flex-shrink: 0;
+}

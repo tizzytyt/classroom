@@ -58,6 +58,10 @@ public class ExamPaperDetailResponse {
   private Integer status;
   /** 是否打乱题目顺序：0否 1是 */
   private Integer shuffleQuestions;
+  /** 学生端：是否已提交过该试卷 */
+  private Boolean submitted;
+  /** 学生端：已提交答卷中的最高分 */
+  private Double myBestScore;
   private List<Question> questions;
 
   public Long getPaperId() { return paperId; }
@@ -76,6 +80,10 @@ public class ExamPaperDetailResponse {
   public void setStatus(Integer status) { this.status = status; }
   public Integer getShuffleQuestions() { return shuffleQuestions; }
   public void setShuffleQuestions(Integer shuffleQuestions) { this.shuffleQuestions = shuffleQuestions; }
+  public Boolean getSubmitted() { return submitted; }
+  public void setSubmitted(Boolean submitted) { this.submitted = submitted; }
+  public Double getMyBestScore() { return myBestScore; }
+  public void setMyBestScore(Double myBestScore) { this.myBestScore = myBestScore; }
   public List<Question> getQuestions() { return questions; }
   public void setQuestions(List<Question> questions) { this.questions = questions; }
 }

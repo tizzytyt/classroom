@@ -31,7 +31,8 @@ Page({
       this.setData({
         list: arr.map((x) => ({
           ...x,
-          attemptId: x.attemptId != null ? String(x.attemptId) : ''
+          attemptId: x.attemptId != null ? String(x.attemptId) : '',
+          graded: !!x.graded
         }))
       })
     } catch (e) {

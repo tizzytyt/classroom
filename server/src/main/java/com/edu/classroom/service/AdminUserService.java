@@ -135,7 +135,8 @@ public class AdminUserService {
     if (id == 1L) throw new RuntimeException("不能删除系统管理员");
     SysUser exist = sysUserMapper.findById(id);
     if (exist == null) throw new RuntimeException("用户不存在");
-    sysUserMapper.softDelete(id);
+    int rows = sysUserMapper.hardDelete(id);
+    if (rows <= 0) throw new RuntimeException("删除失败，请重试");
   }
 }
 

@@ -23,7 +23,7 @@
     <view wx:for="{{items}}" wx:key="id" class="card userCard" bindtap="openActions" data-id="{{item.id}}">
       <view class="userTop">
         <view class="userName">{{item.realName || '-'}}</view>
-        <view class="tag {{item.isDeleted ? 'tagDel' : (item.status === 1 ? 'tagOk' : 'tagOff')}}">{{item.isDeleted ? '删除' : (item.status === 1 ? '启用' : '禁用')}}</view>
+        <view class="tag {{item.status === 1 ? 'tagOk' : 'tagOff'}}">{{item.status === 1 ? '启用' : '禁用'}}</view>
       </view>
       <view class="userSub">{{item.username}} · {{item.roleName}}</view>
       <view class="userMeta">{{item.phone || ''}} {{item.email ? ('· ' + item.email) : ''}}</view>

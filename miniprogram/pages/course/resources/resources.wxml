@@ -1,7 +1,7 @@
 <view class="page">
   <view class="card" wx:if="{{isTeacher}}">
     <view class="sectionTitle">发布学习资源</view>
-    <view class="sectionSub">填写标题与分类后，选择文件将自动上传并发布到课程</view>
+    <view class="sectionSub">选择文件后将自动填充标题和分类，并上传发布到课程</view>
 
     <input class="input" placeholder="资源标题" value="{{publishForm.title}}" bindinput="onPublishTitleInput" />
     <input class="input inputTop" placeholder="资源简介（选填）" value="{{publishForm.description}}" bindinput="onPublishDescInput" />
@@ -18,7 +18,7 @@
       <view wx:for="{{list}}" wx:key="id" class="item">
         <view class="name">
           {{item.title}}
-          <text wx:if="{{learnedMap[String(item.id)]}}" class="learnedCheck">✅</text>
+          <text wx:if="{{item.learned || learnedMap[item.id]}}" class="learnedCheck">✅</text>
         </view>
         <view class="meta">{{item.category}} · {{item.fileName}}</view>
         <view class="meta">大小：{{item.fileSize}} 字节</view>

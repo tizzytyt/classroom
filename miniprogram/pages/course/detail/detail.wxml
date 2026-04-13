@@ -3,7 +3,6 @@
     <view class="title">{{course.name}}</view>
     <view class="sub">课程代码：{{course.courseCode}}</view>
     <view class="sub">{{course.intro || '暂无课程简介'}}</view>
-    <view class="sub">类别：{{course.category || '未分类'}}</view>
     <view class="sub" wx:if="{{isTeacher && course.gradeAssignmentWeight != null}}">总评占比：作业 {{courseGradeAssignPct}}% · 签到 {{courseGradeCheckinPct}}% · 资源 {{courseGradeResourcePct}}% · 考试 {{courseGradeExamPct}}%</view>
     <view class="teacherOps" wx:if="{{isTeacher}}">
       <button class="btnSmall" bindtap="toggleEdit">{{editing ? '取消编辑' : '编辑课程信息'}}</button>
@@ -16,7 +15,6 @@
     <view class="sectionTitle">编辑课程信息</view>
     <input class="input" placeholder="课程名称" value="{{editForm.name}}" bindinput="onEditNameInput" />
     <input class="input inputTop" placeholder="课程简介（选填）" value="{{editForm.intro}}" bindinput="onEditIntroInput" />
-    <input class="input inputTop" placeholder="课程类别（选填）" value="{{editForm.category}}" bindinput="onEditCategoryInput" />
     <view class="sectionSub">总评占比（百分数，合计 100）</view>
     <view class="weightLabelRow">
       <view class="weightLabel">作业</view>

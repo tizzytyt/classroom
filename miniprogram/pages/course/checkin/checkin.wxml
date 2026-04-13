@@ -18,9 +18,10 @@
             {{item.checkedIn ? '已签到' : '未签到'}}
           </view>
         </view>
+        <view class="meta">课程：{{courseName || ('课程ID ' + item.courseId)}}</view>
         <view class="meta">开始：{{item.startAt || '—'}}</view>
         <view class="meta">截止：{{item.endAt || '未设置'}}</view>
-        <view class="meta">状态：{{item.status === 1 ? '进行中' : '已结束'}}</view>
+        <view class="meta">状态：{{item.statusText}}</view>
       </view>
     </block>
   </view>
@@ -53,14 +54,15 @@
     <view class="tip" wx:elif="{{!checkins.length}}">暂无签到活动</view>
     <block wx:else>
       <view wx:for="{{checkins}}" wx:key="id" class="item">
+        <view class="meta">课程：{{courseName || ('课程ID ' + courseId)}}</view>
         <view class="meta">签到码：{{item.checkinCode || '—'}}（历史活动可能无短码）</view>
         <view class="meta">标题：{{item.title}}</view>
         <view class="meta">开始：{{item.startAt}}</view>
         <view class="meta">截止：{{item.endAt || '未设置'}}</view>
-        <view class="meta">状态：{{item.status === 1 ? '进行中' : '已结束'}}</view>
+        <view class="meta">状态：{{item.statusText}}</view>
         <view class="btnRow">
           <button size="mini" class="btnMini" data-id="{{item.id}}" bindtap="goStatsPage">出勤情况</button>
-          <button wx:if="{{item.status === 1}}" size="mini" class="btnMiniDanger" data-id="{{item.id}}" bindtap="closeCheckin">结束</button>
+          <button wx:if="{{item.active}}" size="mini" class="btnMiniDanger" data-id="{{item.id}}" bindtap="closeCheckin">结束</button>
         </view>
       </view>
     </block>

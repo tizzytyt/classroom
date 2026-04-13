@@ -1,4 +1,5 @@
 const { postJson } = require('../../../utils/request')
+const { baseURL } = require('../../../utils/config')
 
 function storageKey(attemptId) {
   return `exam_attempt_${String(attemptId)}`
@@ -20,6 +21,16 @@ function parseMultiKeys(ans) {
   return Object.keys(set).sort()
 }
 
+function getSaConfig(q) {
+  const keys = Array.isArray(q && q.options)
+    ? q.options.map((o) => String(o && o.key ? o.key : '').toUpperCase())
+    : []
+  const allowText = keys.includes('TEXT') || keys.length === 0
+  const allowImage = keys.includes('IMAGE')
+  const allowFile = keys.includes('FILE')
+  return { allowText, allowImage, allowFile }
+}
+
 Page({
   data: {
     courseId: '',
@@ -35,6 +46,11 @@ Page({
     answerMultiKeys: [],
     answerTfKey: 'T',
     answerText: '',
+    answerSaFiles: [],
+    saAllowText: true,
+    saAllowImage: false,
+    saAllowFile: false,
+    saUploading: false,
     submitting: false
   },
   onLoad(options) {
@@ -87,16 +103,39 @@ Page({
     let answerTfKey = 'T'
     let answerMultiKeys = []
     let answerText = ''
+    let answerSaFiles = []
     if (qt === 1) {
       answerSingleKey = safeUpper(saved)
     } else if (qt === 3) {
       answerTfKey = safeUpper(saved) === 'F' ? 'F' : 'T'
     } else if (qt === 2) {
       answerMultiKeys = parseMultiKeys(saved)
+    } else if (qt === 5) {
+      if (saved) {
+        try {
+          const obj = JSON.parse(saved)
+          answerText = obj && obj.text ? String(obj.text) : ''
+          answerSaFiles = Array.isArray(obj && obj.files) ? obj.files : []
+        } catch (e) {
+          answerText = saved
+          answerSaFiles = []
+        }
+      }
     } else {
       answerText = saved
     }
-    this.setData({ q, answerSingleKey, answerTfKey, answerMultiKeys, answerText })
+    const saCfg = getSaConfig(q)
+    this.setData({
+      q,
+      answerSingleKey,
+      answerTfKey,
+      answerMultiKeys,
+      answerText,
+      answerSaFiles,
+      saAllowText: !!saCfg.allowText,
+      saAllowImage: !!saCfg.allowImage,
+      saAllowFile: !!saCfg.allowFile
+    })
   },
   saveCurrentAnswer() {
     const q = this.data.q
@@ -112,6 +151,11 @@ Page({
       ans = this.data.answerTfKey === 'F' ? 'F' : 'T'
     } else if (qt === 2) {
       ans = Array.isArray(this.data.answerMultiKeys) ? this.data.answerMultiKeys.join(',') : ''
+    } else if (qt === 5) {
+      const cfg = getSaConfig(q)
+      const text = cfg.allowText ? String(this.data.answerText || '').trim() : ''
+      const files = Array.isArray(this.data.answerSaFiles) ? this.data.answerSaFiles : []
+      ans = JSON.stringify({ text, files })
     } else {
       ans = String(this.data.answerText || '').trim()
     }
@@ -140,6 +184,78 @@ Page({
   },
   onTextInput(e) {
     this.setData({ answerText: e.detail.value || '' })
+  },
+  chooseSaImage() {
+    if (!this.data.q || this.data.saUploading) return
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const files = (res && res.tempFiles) || []
+        if (!files.length) return
+        const f = files[0]
+        const name = (f.tempFilePath || '').split('/').pop() || 'image.jpg'
+        this.uploadSaFile(f.tempFilePath, name)
+      }
+    })
+  },
+  chooseSaFile() {
+    if (!this.data.q || this.data.saUploading) return
+    wx.chooseMessageFile({
+      count: 1,
+      type: 'file',
+      success: (res) => {
+        const files = (res && res.tempFiles) || []
+        if (!files.length) return
+        const f = files[0]
+        this.uploadSaFile(f.path, f.name || 'file')
+      }
+    })
+  },
+  uploadSaFile(filePath, originalFileName) {
+    if (!filePath) return
+    const token = wx.getStorageSync('token') || ''
+    this.setData({ saUploading: true })
+    wx.showLoading({ title: '上传中...' })
+    wx.uploadFile({
+      url: `${baseURL}/api/student/exams/${encodeURIComponent(this.data.paperId)}/upload-answer-file?courseId=${encodeURIComponent(this.data.courseId)}`,
+      filePath,
+      name: 'file',
+      formData: { originalFileName: String(originalFileName || '').trim().slice(0, 255) },
+      header: token ? { Authorization: 'Bearer ' + token } : {},
+      success: (res) => {
+        wx.hideLoading()
+        this.setData({ saUploading: false })
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          wx.showToast({ title: '上传失败', icon: 'none' })
+          return
+        }
+        let body = {}
+        try { body = JSON.parse(res.data || '{}') } catch (e) {}
+        if (!body.fileUrl) {
+          wx.showToast({ title: '上传返回异常', icon: 'none' })
+          return
+        }
+        const next = (this.data.answerSaFiles || []).concat([{
+          fileUrl: body.fileUrl,
+          fileName: body.fileName || originalFileName || '附件',
+          fileType: body.fileType || ''
+        }])
+        this.setData({ answerSaFiles: next })
+      },
+      fail: () => {
+        wx.hideLoading()
+        this.setData({ saUploading: false })
+        wx.showToast({ title: '上传失败', icon: 'none' })
+      }
+    })
+  },
+  removeSaFile(e) {
+    const url = e && e.currentTarget ? e.currentTarget.dataset.url : ''
+    if (!url) return
+    const next = (this.data.answerSaFiles || []).filter((x) => x.fileUrl !== url)
+    this.setData({ answerSaFiles: next })
   },
   prevQ() {
     this.saveCurrentAnswer()

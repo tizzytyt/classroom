@@ -77,6 +77,15 @@ public class StudentController {
     return ResponseEntity.ok(studentService.uploadAssignmentSubmissionFile(assignmentId, uid, file, originalFileName));
   }
 
+  @PostMapping(value = "/exams/{paperId}/upload-answer-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<Map<String, Object>> uploadExamAnswerFile(@RequestAttribute("uid") Long uid,
+                                                                   @PathVariable Long paperId,
+                                                                   @RequestParam Long courseId,
+                                                                   @RequestParam("file") MultipartFile file,
+                                                                   @RequestParam(value = "originalFileName", required = false) String originalFileName) {
+    return ResponseEntity.ok(studentService.uploadExamAnswerFile(paperId, courseId, uid, file, originalFileName));
+  }
+
   @PostMapping("/checkin/{checkinId}")
   public ResponseEntity<Void> checkin(@RequestAttribute("uid") Long uid, @PathVariable Long checkinId, @RequestParam(defaultValue = "CLICK") String source) {
     studentService.checkin(checkinId, uid, source);

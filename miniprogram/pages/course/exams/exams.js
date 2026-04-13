@@ -37,7 +37,27 @@ Page({
       const isTeacher = this.data.isTeacher
       let raw = []
       if (isTeacher) {
-        raw = await request(`/api/teacher/courses/${cid}/exams`, 'GET')
+        const pair = await Promise.all([
+          request(`/api/teacher/courses/${cid}/exams`, 'GET'),
+          request(`/api/teacher/courses/${cid}/exams/pending-grading-counts`, 'GET')
+        ])
+        raw = pair[0]
+        const pendingMap = pair[1] || {}
+        raw = Array.isArray(raw) ? raw : []
+        const list = raw.map((x) => {
+          const idStr = x && x.id != null ? String(x.id) : ''
+          const pending = pendingMap && pendingMap[idStr] != null
+            ? Number(pendingMap[idStr]) || 0
+            : 0
+          return {
+            ...x,
+            statusText: statusText(x.status),
+            id: idStr,
+            pendingCount: pending
+          }
+        })
+        this.setData({ list })
+        return
       } else {
         raw = await request(`/api/student/exams?courseId=${encodeURIComponent(cid)}`, 'GET')
       }
@@ -46,7 +66,8 @@ Page({
         ...x,
         statusText: statusText(x.status),
         // 大整数 id 必须以字符串参与路由，避免 setData/模板中变成不安全的 Number
-        id: x.id != null ? String(x.id) : ''
+        id: x.id != null ? String(x.id) : '',
+        examDone: !isTeacher && x.myBestScore != null
       }))
       this.setData({ list })
     } catch (e) {

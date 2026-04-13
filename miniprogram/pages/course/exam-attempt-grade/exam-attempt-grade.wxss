@@ -79,6 +79,16 @@
   font-size: 28rpx;
 }
 
+.scoreReadonly {
+  flex: 1;
+  border: 1rpx solid #f0f0f0;
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  font-size: 28rpx;
+  color: #555555;
+  background: #fafafa;
+}
+
 .btnPrimary {
   margin-top: 24rpx;
   background: #1677ff;
@@ -90,4 +100,10 @@
   font-size: 24rpx;
   color: #888888;
   margin-top: 12rpx;
+}
+
+.gradedTip {
+  font-size: 26rpx;
+  color: #ff4d4f;
+  margin: 8rpx 0 12rpx;
 }

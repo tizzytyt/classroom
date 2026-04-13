@@ -53,6 +53,9 @@ Page({
       optB: '',
       optC: '',
       optD: '',
+      allowText: true,
+      allowImage: false,
+      allowFile: false,
       correctAnswer: 'A',
       score: '5',
       sortNo: '1'
@@ -109,6 +112,13 @@ Page({
         tfIndex: 0,
         'newQ.correctAnswer': 'T'
       })
+    } else if (t === 5) {
+      this.setData({
+        'newQ.qType': 5,
+        'newQ.allowText': true,
+        'newQ.allowImage': false,
+        'newQ.allowFile': false
+      })
     } else {
       this.setData({
         'newQ.qType': 1,
@@ -116,6 +126,15 @@ Page({
         'newQ.correctAnswer': 'A'
       })
     }
+  },
+  onSaAllowTextChange(e) {
+    this.setData({ 'newQ.allowText': !!(e && e.detail && e.detail.value) })
+  },
+  onSaAllowImageChange(e) {
+    this.setData({ 'newQ.allowImage': !!(e && e.detail && e.detail.value) })
+  },
+  onSaAllowFileChange(e) {
+    this.setData({ 'newQ.allowFile': !!(e && e.detail && e.detail.value) })
   },
   onStemInput(e) {
     this.setData({ 'newQ.stem': e.detail.value || '' })
@@ -195,6 +214,9 @@ Page({
         optB: '',
         optC: '',
         optD: '',
+        allowText: true,
+        allowImage: false,
+        allowFile: false,
         correctAnswer: keepType === 3 ? 'T' : 'A',
         score: '5',
         sortNo: String(nextList.length + 1)
@@ -215,6 +237,9 @@ Page({
         optB: '',
         optC: '',
         optD: '',
+        allowText: true,
+        allowImage: false,
+        allowFile: false,
         correctAnswer: 'A',
         score: '5',
         sortNo: String(n + 1)

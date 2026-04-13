@@ -25,10 +25,24 @@ Page({
     },
     savingEdit: false
   },
+  isItemLearned(item) {
+    if (!item || typeof item !== 'object') return false
+    // 兼容后端可能返回的不同进度字段
+    const status = Number(item.learnStatus != null ? item.learnStatus : item.status)
+    const percent = Number(item.learnPercent != null ? item.learnPercent : item.percent)
+    return !!(item.learned || item.isLearned || status === 2 || percent >= 100)
+  },
   setLearned(resourceId) {
     if (!resourceId) return
     const key = String(resourceId)
-    this.setData({ [`learnedMap.${key}`]: true })
+    const nextList = (this.data.list || []).map((item) => {
+      if (String(item.id) !== key) return item
+      return Object.assign({}, item, { learned: true })
+    })
+    this.setData({
+      [`learnedMap.${key}`]: true,
+      list: nextList
+    })
   },
   syncLearnedProgress(resourceId) {
     if (this.data.isTeacher || !resourceId) return
@@ -64,7 +78,15 @@ Page({
       const res = isTeacher
         ? await request(`/api/teacher/courses/${this.data.courseId}/resources`, 'GET')
         : await request(`/api/student/resources?courseId=${this.data.courseId}`, 'GET')
-      this.setData({ list: Array.isArray(res) ? res : [] })
+      const rawList = Array.isArray(res) ? res : []
+      const learnedMap = {}
+      const list = rawList.map((item) => {
+        const learned = this.isItemLearned(item)
+        const idKey = item && item.id != null ? String(item.id) : ''
+        if (idKey && learned) learnedMap[idKey] = true
+        return Object.assign({}, item, { learned })
+      })
+      this.setData({ list, learnedMap })
     } catch (e) {
       wx.showToast({ title: (e && e.message) ? e.message : '加载资源失败', icon: 'none' })
     } finally {
@@ -145,17 +167,27 @@ Page({
   onPublishCategoryInput(e) {
     this.setData({ 'publishForm.category': (e.detail.value || '').trim() })
   },
+  parseTitleAndCategory(fileName) {
+    const raw = (fileName || '').trim()
+    if (!raw) return { title: '', category: '' }
+    const dot = raw.lastIndexOf('.')
+    if (dot <= 0 || dot === raw.length - 1) {
+      return { title: raw, category: 'other' }
+    }
+    return {
+      title: raw.slice(0, dot).trim() || raw,
+      category: raw.slice(dot + 1).trim().toLowerCase() || 'other'
+    }
+  },
+  applyPublishFormByFileName(fileName) {
+    const parsed = this.parseTitleAndCategory(fileName)
+    this.setData({
+      'publishForm.title': parsed.title,
+      'publishForm.category': parsed.category
+    })
+  },
   chooseAndUploadFile() {
     if (!this.data.isTeacher || this.data.uploading) return
-    const f = this.data.publishForm || {}
-    if (!(f.title || '').trim()) {
-      wx.showToast({ title: '请先填写资源标题', icon: 'none' })
-      return
-    }
-    if (!(f.category || '').trim()) {
-      wx.showToast({ title: '请先填写资源分类', icon: 'none' })
-      return
-    }
     wx.showActionSheet({
       itemList: ['选择任意文件', '从相册/相机选择视频'],
       success: (r) => {
@@ -169,6 +201,7 @@ Page({
               if (!files.length) return
               const f = files[0]
               const guessName = (f.tempFilePath || '').split('/').pop() || 'video.mp4'
+              this.applyPublishFormByFileName(guessName)
               this.doUploadFile(f.tempFilePath, f.size, 'video/mp4', guessName)
             },
             fail: () => wx.showToast({ title: '未选择视频', icon: 'none' })
@@ -182,6 +215,7 @@ Page({
             const files = res && res.tempFiles ? res.tempFiles : []
             if (!files.length) return
             const f = files[0]
+            this.applyPublishFormByFileName(f.name)
             this.doUploadFile(f.path, f.size, f.type, f.name)
           },
           fail: () => wx.showToast({ title: '未选择文件', icon: 'none' })

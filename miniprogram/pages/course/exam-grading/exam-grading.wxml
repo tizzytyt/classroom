@@ -9,7 +9,10 @@
     <view wx:elif="{{!list.length}}" class="tip">暂无已提交答卷</view>
     <block wx:else>
       <view wx:for="{{list}}" wx:key="attemptId" class="item" data-id="{{item.attemptId}}" bindtap="openAttempt">
-        <view class="name">{{item.studentName}}</view>
+        <view class="rowTop">
+          <view class="name">{{item.studentName}}</view>
+          <view wx:if="{{item.graded}}" class="gradedTag">已批改</view>
+        </view>
         <view class="meta">提交时间：{{item.submittedAt || '—'}}</view>
         <view class="meta">得分：{{item.totalScore != null ? item.totalScore : '—'}}（客观机判：{{item.objectiveScore != null ? item.objectiveScore : '—'}}）</view>
       </view>

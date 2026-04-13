@@ -207,6 +207,8 @@ Page({
         }
       }
       const studentQs = buildStudentQuestionRows((d && d.questions) || [])
+      const submitted = !!(d && d.submitted)
+      const best = d && d.myBestScore != null ? d.myBestScore : null
       if (DEBUG_STUDENT_EXAM && __printedStudentExamOnce) {
         try {
           console.log(
@@ -224,15 +226,19 @@ Page({
         studentDetail: d || null,
         studentQs,
         examStarted: false,
-        examSubmitted: false,
+        examSubmitted: submitted,
         attemptId: '',
-        examScoreResult: null
+        examScoreResult: submitted ? { totalScore: best } : null
       })
     } catch (e) {
       wx.showToast({ title: (e && e.message) ? e.message : '加载失败', icon: 'none' })
     }
   },
   async startStudentExam() {
+    if (this.data.examSubmitted) {
+      wx.showToast({ title: '该考试已完成，禁止重复提交', icon: 'none' })
+      return
+    }
     this.setData({ startingExam: true })
     try {
       const res = await request(

@@ -8,17 +8,19 @@
     <view wx:elif="{{!list.length}}" class="tip">{{isTeacher ? '暂无试卷' : '暂无进行中的考试'}}</view>
     <block wx:else>
       <view wx:for="{{list}}" wx:key="id" class="item">
-        <view data-id="{{item.id}}" bindtap="openPaper">
+        <view data-id="{{item.id}}" data-done="{{item.examDone}}" bindtap="openPaper">
           <view class="itemTitleRow">
             <view class="name">{{item.title}}</view>
             <view wx:if="{{isTeacher}}" class="badge badge-{{item.status === 1 ? 'live' : (item.status === 2 ? 'off' : 'draft')}}">{{item.statusText}}</view>
           </view>
           <view class="meta">时长：{{item.durationMinutes != null ? item.durationMinutes + ' 分钟' : '不限'}}</view>
           <view class="meta">开放：{{item.startAt || '不限'}} ~ {{item.endAt || '不限'}}</view>
+          <view class="meta" wx:if="{{!isTeacher}}">状态：{{item.examDone ? '已完成' : '进行中'}}</view>
           <view class="meta scoreLine" wx:if="{{!isTeacher && item.myBestScore != null}}">最高得分：{{item.myBestScore}}</view>
         </view>
         <view wx:if="{{isTeacher && (item.status === 1 || item.status === 2)}}" class="examTeacherRow">
           <button size="mini" class="miniBtn" catchtap="goGradePaper" data-id="{{item.id}}" data-title="{{item.title}}">批改答卷</button>
+          <view class="pendingText">待批改：{{item.pendingCount || 0}}</view>
         </view>
       </view>
     </block>

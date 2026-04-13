@@ -92,9 +92,7 @@ Page({
       const items = Array.isArray(res.items) ? res.items : []
       const normalized = items.map(it => ({
         ...it,
-        roleName: roleName(it.roleCode),
-        // 后端删除为软删除：status=0 且 username 会追加 _deleted_{id}
-        isDeleted: typeof it.username === 'string' && it.username.indexOf('_deleted_') >= 0
+        roleName: roleName(it.roleCode)
       }))
       const merged = replace ? normalized : this.data.items.concat(normalized)
       const total = typeof res.total === 'number' ? res.total : Number(res.total || 0)
@@ -125,10 +123,6 @@ Page({
     const id = e.currentTarget.dataset.id
     const user = this.findById(id)
     if (!user) return
-    if (user.isDeleted) {
-      wx.showToast({ title: '该账号已删除', icon: 'none' })
-      return
-    }
     const actions = ['编辑资料', '修改角色', user.status === 1 ? '禁用账号' : '启用账号', '重置密码(默认123456)', '删除账号']
     wx.showActionSheet({
       itemList: actions,
@@ -202,7 +196,7 @@ Page({
   deleteUser(user) {
     wx.showModal({
       title: '删除账号',
-      content: '确认删除该账号？删除后将被禁用且用户名会被释放。',
+      content: '确认删除该账号？删除后将从系统中彻底移除。',
       confirmColor: '#ff3b30',
       success: async r => {
         if (!r.confirm) return

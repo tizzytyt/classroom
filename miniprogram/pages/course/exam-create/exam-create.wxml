@@ -14,6 +14,7 @@
     <view class="typeRow">
       <view class="typeBtn {{newQ.qType === 1 ? 'typeBtnOn' : ''}}" data-type="1" bindtap="setQType">单选题</view>
       <view class="typeBtn {{newQ.qType === 3 ? 'typeBtnOn' : ''}}" data-type="3" bindtap="setQType">判断题</view>
+      <view class="typeBtn {{newQ.qType === 5 ? 'typeBtnOn' : ''}}" data-type="5" bindtap="setQType">简答题</view>
     </view>
     <textarea class="textarea" placeholder="题干" value="{{newQ.stem}}" bindinput="onStemInput" />
     <block wx:if="{{newQ.qType === 1}}">
@@ -29,6 +30,21 @@
       <picker mode="selector" range="{{tfLabels}}" value="{{tfIndex}}" bindchange="onTfPick">
         <view class="pickerCell pickerCellFull">正确答案：{{tfLabels[tfIndex]}}</view>
       </picker>
+    </block>
+    <block wx:if="{{newQ.qType === 5}}">
+      <view class="sectionSub">简答题作答方式（至少选择一种）</view>
+      <view class="switchRow">
+        <view class="switchLabel">允许文本作答</view>
+        <switch checked="{{newQ.allowText}}" bindchange="onSaAllowTextChange" />
+      </view>
+      <view class="switchRow">
+        <view class="switchLabel">允许上传图片</view>
+        <switch checked="{{newQ.allowImage}}" bindchange="onSaAllowImageChange" />
+      </view>
+      <view class="switchRow">
+        <view class="switchLabel">允许上传文件</view>
+        <switch checked="{{newQ.allowFile}}" bindchange="onSaAllowFileChange" />
+      </view>
     </block>
     <view class="row2">
       <view class="inputLabel">分值</view>
