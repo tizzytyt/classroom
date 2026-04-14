@@ -6,6 +6,7 @@
     "pages/index/index",
     "pages/course/detail/detail",
     "pages/course/resources/resources",
+    "pages/course/recordings/recordings",
     "pages/course/video-player/video-player",
     "pages/course/text-preview/text-preview",
     "pages/course/monitor/monitor",

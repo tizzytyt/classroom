@@ -1,0 +1,16 @@
+<view class="page">
+  <view class="card">
+    <view class="title">课程录播课</view>
+    <view wx:if="{{loading}}" class="tip">加载中...</view>
+    <view wx:elif="{{!list.length}}" class="tip">暂无录播课资源</view>
+    <block wx:else>
+      <view wx:for="{{list}}" wx:key="id" class="item">
+        <view class="name">{{item.title || '未命名视频'}}</view>
+        <view class="meta">{{item.category || '未分类'}} · {{item.fileName || '视频文件'}}</view>
+        <view class="meta">大小：{{item.fileSize || 0}} 字节</view>
+        <button size="mini" class="miniBtn" data-id="{{item.id}}" bindtap="openVideo">在线观看</button>
+      </view>
+    </block>
+  </view>
+</view>
+

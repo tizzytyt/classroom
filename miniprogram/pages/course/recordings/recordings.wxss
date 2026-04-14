@@ -1,0 +1,41 @@
+.page {
+  padding: 24rpx;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.tip {
+  font-size: 26rpx;
+  color: #888888;
+}
+
+.item {
+  padding: 16rpx 0;
+  border-top: 1px solid #f5f5f5;
+}
+
+.name {
+  font-size: 28rpx;
+  margin-bottom: 4rpx;
+}
+
+.meta {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.miniBtn {
+  margin-top: 10rpx;
+}
+

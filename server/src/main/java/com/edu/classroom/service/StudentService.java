@@ -338,8 +338,6 @@ public class StudentService {
     if (paper == null) throw new RuntimeException("试卷不存在或无权限");
     LocalDateTime now = LocalDateTime.now();
     if (paper.getStartAt() != null && now.isBefore(paper.getStartAt())) throw new RuntimeException("试卷未开始");
-    if (paper.getEndAt() != null && now.isAfter(paper.getEndAt())) throw new RuntimeException("试卷已结束");
-
     List<ExamQuestion> qs = examMapper.listQuestionsByPaper(paperId);
     List<com.edu.classroom.dto.exam.ExamPaperDetailResponse.Option> opts = examMapper.listOptionsByPaper(paperId);
     Map<Long, List<com.edu.classroom.dto.exam.ExamPaperDetailResponse.Option>> optMap = new HashMap<>();
@@ -375,7 +373,7 @@ public class StudentService {
     resp.setEndAt(paper.getEndAt());
     resp.setStatus(paper.getStatus());
     resp.setShuffleQuestions(paper.getShuffleQuestions());
-    Double myBestScore = examMapper.bestSubmittedScoreByPaperAndStudent(paperId, studentId);
+    Double myBestScore = examMapper.bestFinalScoreByPaperAndStudent(paperId, studentId);
     resp.setSubmitted(myBestScore != null);
     resp.setMyBestScore(myBestScore);
     resp.setQuestions(qResp);
@@ -389,8 +387,8 @@ public class StudentService {
     LocalDateTime now = LocalDateTime.now();
     if (paper.getStartAt() != null && now.isBefore(paper.getStartAt())) throw new RuntimeException("试卷未开始");
     if (paper.getEndAt() != null && now.isAfter(paper.getEndAt())) throw new RuntimeException("试卷已结束");
-    if (examMapper.bestSubmittedScoreByPaperAndStudent(paperId, studentId) != null) {
-      throw new RuntimeException("该试卷已完成，禁止重复提交");
+    if (examMapper.bestFinalScoreByPaperAndStudent(paperId, studentId) != null) {
+      throw new RuntimeException("该试卷已评分，禁止重复提交");
     }
 
     Long attemptId = examMapper.genId();

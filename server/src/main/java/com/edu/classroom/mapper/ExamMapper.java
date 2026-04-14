@@ -115,6 +115,8 @@ public interface ExamMapper {
 
   Double bestSubmittedScoreByPaperAndStudent(@Param("paperId") Long paperId, @Param("studentId") Long studentId);
 
+  Double bestFinalScoreByPaperAndStudent(@Param("paperId") Long paperId, @Param("studentId") Long studentId);
+
   Integer countPendingSubjectiveAttemptsByPaper(@Param("teacherId") Long teacherId,
                                                 @Param("courseId") Long courseId,
                                                 @Param("paperId") Long paperId);

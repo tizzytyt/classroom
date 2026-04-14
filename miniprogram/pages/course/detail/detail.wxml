@@ -34,6 +34,7 @@
   <view class="card">
     <view class="sectionTitle">学习入口</view>
     <button class="btn" bindtap="goResources">学习资源</button>
+    <button class="btn" bindtap="goRecordings">录播课</button>
     <button class="btn" bindtap="goExams">{{isTeacher ? '试卷与考试' : '课程考试'}}</button>
     <button class="btn" bindtap="goAssignments">作业列表</button>
     <button class="btn" bindtap="goGrade">成绩与进度</button>

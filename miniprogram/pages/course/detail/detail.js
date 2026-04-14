@@ -103,6 +103,11 @@ Page({
       url: `/pages/course/resources/resources?courseId=${this.data.courseId}`
     })
   },
+  goRecordings() {
+    wx.navigateTo({
+      url: `/pages/course/recordings/recordings?courseId=${this.data.courseId}`
+    })
+  },
   goExams() {
     wx.navigateTo({
       url: `/pages/course/exams/exams?courseId=${this.data.courseId}`

@@ -7,6 +7,13 @@ function statusText(s) {
   return '草稿'
 }
 
+function toMillis(t) {
+  if (!t) return NaN
+  const s = String(t).trim()
+  if (!s) return NaN
+  return new Date(s.replace(/-/g, '/')).getTime()
+}
+
 Page({
   data: {
     courseId: '',
@@ -67,7 +74,10 @@ Page({
         statusText: statusText(x.status),
         // 大整数 id 必须以字符串参与路由，避免 setData/模板中变成不安全的 Number
         id: x.id != null ? String(x.id) : '',
-        examDone: !isTeacher && x.myBestScore != null
+        examDone: !isTeacher && x.myBestScore != null,
+        studentStatusText: (!isTeacher && x.myBestScore != null)
+          ? '已评分'
+          : (toMillis(x.endAt) && Date.now() > toMillis(x.endAt) ? '已结束' : '进行中')
       }))
       this.setData({ list })
     } catch (e) {
