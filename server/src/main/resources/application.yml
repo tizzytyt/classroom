@@ -7,6 +7,10 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false

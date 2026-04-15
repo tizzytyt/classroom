@@ -143,7 +143,7 @@ public class TeacherController {
     return ResponseEntity.ok(created);
   }
 
-  @PostMapping("/courses/{courseId}/resources/upload")
+  @PostMapping(value = "/courses/{courseId}/resources/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<?> uploadResourceFile(@RequestAttribute("uid") Long uid,
                                                @RequestAttribute("role") Object role,
                                                @PathVariable Long courseId,

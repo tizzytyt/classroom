@@ -5,10 +5,17 @@
 function withFileAccessToken(url) {
   if (!url || String(url).indexOf('/api/files/') === -1) return url
   try {
-    const token = wx.getStorageSync('token') || ''
-    if (!token) return url
-    const sep = String(url).indexOf('?') >= 0 ? '&' : '?'
-    return String(url) + sep + 'token=' + encodeURIComponent(token)
+    const raw = String(url)
+    const basePart = raw.split('#')[0]
+    const qMark = basePart.indexOf('?')
+    const pathPart = qMark >= 0 ? basePart.slice(0, qMark) : basePart
+    const fileName = fileNameFromUrl(pathPart)
+    if (!fileName) return url
+    const absolutePrefix = pathPart.startsWith('http')
+      ? pathPart.slice(0, pathPart.indexOf('/api/files/'))
+      : ''
+    // /api/files 已放行，视频播放优先使用短路径，避免查询串在部分环境触发媒体加载异常
+    return absolutePrefix + '/api/files/' + encodeURIComponent(fileName)
   } catch (e) {
     return url
   }

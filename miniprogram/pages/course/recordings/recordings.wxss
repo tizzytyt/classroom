@@ -15,6 +15,10 @@
   margin-bottom: 16rpx;
 }
 
+.uploadBtn {
+  margin-bottom: 16rpx;
+}
+
 .tip {
   font-size: 26rpx;
   color: #888888;

@@ -132,8 +132,22 @@
 
   <select id="listStudentAvailablePapers" resultMap="PaperMap">
     select p.*,
-      (select max(a.total_score) from exam_attempt a
-        where a.paper_id = p.id and a.student_id = #{studentId} and a.status = 2) as my_best_score
+      (
+        select max(a.total_score)
+        from exam_attempt a
+        where a.paper_id = p.id
+          and a.student_id = #{studentId}
+          and a.status = 2
+          and not exists (
+            select 1
+            from exam_question q
+            left join exam_answer ea on ea.attempt_id = a.id and ea.question_id = q.id
+            where q.paper_id = a.paper_id
+              and q.status = 1
+              and q.q_type = 5
+              and (ea.id is null or ea.score is null)
+          )
+      ) as my_best_score
     from exam_paper p
     join course c on c.id = p.course_id
     join course_member cm on cm.course_id = c.id
@@ -144,7 +158,6 @@
       and cm.member_role = 'STUDENT'
       and cm.status = 1
       and (p.start_at is null or p.start_at &lt;= now())
-      and (p.end_at is null or p.end_at &gt;= now())
     order by p.created_at desc
   </select>
 
@@ -398,6 +411,23 @@
     where a.paper_id = #{paperId}
       and a.student_id = #{studentId}
       and a.status = 2
+  </select>
+
+  <select id="bestFinalScoreByPaperAndStudent" resultType="double">
+    select max(a.total_score)
+    from exam_attempt a
+    where a.paper_id = #{paperId}
+      and a.student_id = #{studentId}
+      and a.status = 2
+      and not exists (
+        select 1
+        from exam_question q
+        left join exam_answer ea on ea.attempt_id = a.id and ea.question_id = q.id
+        where q.paper_id = a.paper_id
+          and q.status = 1
+          and q.q_type = 5
+          and (ea.id is null or ea.score is null)
+      )
   </select>
 
   <select id="countPendingSubjectiveAttemptsByPaper" resultType="int">

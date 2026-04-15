@@ -1,6 +1,9 @@
 <view class="page">
   <view class="card">
     <view class="title">课程录播课</view>
+    <button wx:if="{{isTeacher}}" class="uploadBtn" type="primary" loading="{{uploading}}" bindtap="chooseAndUploadRecording">
+      {{uploading ? '上传中...' : '上传录播课'}}
+    </button>
     <view wx:if="{{loading}}" class="tip">加载中...</view>
     <view wx:elif="{{!list.length}}" class="tip">暂无录播课资源</view>
     <block wx:else>
