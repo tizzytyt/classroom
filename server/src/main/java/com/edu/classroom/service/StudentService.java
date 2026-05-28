@@ -2,6 +2,8 @@ package com.edu.classroom.service;
 
 import com.edu.classroom.dto.student.StudentAssignmentSubmitRequest;
 import com.edu.classroom.dto.student.StudentCheckinHistoryDto;
+import com.edu.classroom.dto.student.StudentEmergencyContactDto;
+import com.edu.classroom.dto.student.StudentEmergencyContactUpdateRequest;
 import com.edu.classroom.entity.*;
 import com.edu.classroom.mapper.*;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -40,6 +42,7 @@ public class StudentService {
   private final CourseMemberMapper courseMemberMapper;
   private final ExamMapper examMapper;
   private final RecommendationMapper recommendationMapper;
+  private final SysUserMapper sysUserMapper;
 
   public StudentService(CourseMapper courseMapper,
                          ResourceMapper resourceMapper,
@@ -50,7 +53,8 @@ public class StudentService {
                          CourseGradeRuleMapper courseGradeRuleMapper,
                          CourseMemberMapper courseMemberMapper,
                          ExamMapper examMapper,
-                         RecommendationMapper recommendationMapper) {
+                         RecommendationMapper recommendationMapper,
+                         SysUserMapper sysUserMapper) {
     this.courseMapper = courseMapper;
     this.resourceMapper = resourceMapper;
     this.assignmentMapper = assignmentMapper;
@@ -61,6 +65,7 @@ public class StudentService {
     this.courseMemberMapper = courseMemberMapper;
     this.examMapper = examMapper;
     this.recommendationMapper = recommendationMapper;
+    this.sysUserMapper = sysUserMapper;
   }
 
   public List<Course> listJoinedCourses(Long studentId) {
@@ -484,6 +489,41 @@ public class StudentService {
   public void readRecommendation(Long studentId, Long pushId) {
     if (pushId == null) throw new RuntimeException("推送记录ID不能为空");
     recommendationMapper.markRead(pushId, studentId);
+  }
+
+  public StudentEmergencyContactDto getEmergencyContact(Long studentId) {
+    SysUser user = requireStudent(studentId);
+    StudentEmergencyContactDto dto = new StudentEmergencyContactDto();
+    dto.setEmergencyContactName(user.getEmergencyContactName());
+    dto.setEmergencyContactPhone(user.getEmergencyContactPhone());
+    dto.setEmergencyContactRelation(user.getEmergencyContactRelation());
+    return dto;
+  }
+
+  public StudentEmergencyContactDto updateEmergencyContact(Long studentId, StudentEmergencyContactUpdateRequest req) {
+    requireStudent(studentId);
+    if (req == null) throw new RuntimeException("参数错误");
+    String name = req.getEmergencyContactName() != null ? req.getEmergencyContactName().trim() : "";
+    String phone = req.getEmergencyContactPhone() != null ? req.getEmergencyContactPhone().trim() : "";
+    String relation = req.getEmergencyContactRelation() != null ? req.getEmergencyContactRelation().trim() : "";
+    if (!StringUtils.hasText(name)) throw new RuntimeException("请填写紧急联络人姓名");
+    if (!StringUtils.hasText(phone)) throw new RuntimeException("请填写紧急联络人电话");
+    if (!StringUtils.hasText(relation)) throw new RuntimeException("请选择与本人关系");
+    SysUser patch = new SysUser();
+    patch.setId(studentId);
+    patch.setEmergencyContactName(name);
+    patch.setEmergencyContactPhone(phone);
+    patch.setEmergencyContactRelation(relation);
+    sysUserMapper.updateEmergencyContact(patch);
+    return getEmergencyContact(studentId);
+  }
+
+  private SysUser requireStudent(Long studentId) {
+    if (studentId == null) throw new RuntimeException("参数错误");
+    SysUser user = sysUserMapper.findById(studentId);
+    if (user == null) throw new RuntimeException("用户不存在");
+    if (!"STUDENT".equals(user.getRoleCode())) throw new RuntimeException("仅学生可维护紧急联络人");
+    return user;
   }
 
   private void assertStudentInCourse(Long studentId, Long courseId) {

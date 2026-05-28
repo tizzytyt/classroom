@@ -158,5 +158,10 @@ Page({
   },
   doLogout() {
     logout()
+  },
+  goEmergencyContact() {
+    wx.navigateTo({
+      url: '/pages/profile/emergency-contact/emergency-contact'
+    })
   }
 })

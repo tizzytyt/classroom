@@ -11,6 +11,9 @@ public class SysUser {
   private String phone;
   private String email;
   private String avatarUrl;
+  private String emergencyContactName;
+  private String emergencyContactPhone;
+  private String emergencyContactRelation;
   private Integer status;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
@@ -62,6 +65,24 @@ public class SysUser {
   }
   public void setAvatarUrl(String avatarUrl) {
     this.avatarUrl = avatarUrl;
+  }
+  public String getEmergencyContactName() {
+    return emergencyContactName;
+  }
+  public void setEmergencyContactName(String emergencyContactName) {
+    this.emergencyContactName = emergencyContactName;
+  }
+  public String getEmergencyContactPhone() {
+    return emergencyContactPhone;
+  }
+  public void setEmergencyContactPhone(String emergencyContactPhone) {
+    this.emergencyContactPhone = emergencyContactPhone;
+  }
+  public String getEmergencyContactRelation() {
+    return emergencyContactRelation;
+  }
+  public void setEmergencyContactRelation(String emergencyContactRelation) {
+    this.emergencyContactRelation = emergencyContactRelation;
   }
   public Integer getStatus() {
     return status;

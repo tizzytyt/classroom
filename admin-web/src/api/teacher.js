@@ -22,3 +22,23 @@ export async function exportCourseFinalScoresApi(courseId) {
   return resp
 }
 
+export async function listCourseCheckinsApi(courseId) {
+  const resp = await http.get(`/api/teacher/courses/${courseId}/checkins`)
+  return resp.data
+}
+
+export async function createCourseCheckinApi(courseId, payload) {
+  const resp = await http.post(`/api/teacher/courses/${courseId}/checkins`, null, { params: payload })
+  return resp.data
+}
+
+export async function closeCourseCheckinApi(courseId, checkinId) {
+  const resp = await http.post(`/api/teacher/courses/${courseId}/checkins/${checkinId}/close`)
+  return resp.data
+}
+
+export async function checkinStatsApi(courseId, checkinId) {
+  const resp = await http.get(`/api/teacher/courses/${courseId}/checkins/${checkinId}/stats`)
+  return resp.data
+}
+

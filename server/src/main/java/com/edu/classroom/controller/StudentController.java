@@ -4,6 +4,8 @@ import com.edu.classroom.dto.exam.ExamPaperDetailResponse;
 import com.edu.classroom.dto.exam.StudentExamSubmitRequest;
 import com.edu.classroom.dto.student.StudentAssignmentSubmitRequest;
 import com.edu.classroom.dto.student.StudentCheckinHistoryDto;
+import com.edu.classroom.dto.student.StudentEmergencyContactDto;
+import com.edu.classroom.dto.student.StudentEmergencyContactUpdateRequest;
 import com.edu.classroom.dto.student.StudentRecommendationDto;
 import com.edu.classroom.entity.*;
 import com.edu.classroom.service.StudentService;
@@ -158,5 +160,16 @@ public class StudentController {
     Map<String, Object> body = new HashMap<>();
     body.put("message", "ok");
     return ResponseEntity.ok(body);
+  }
+
+  @GetMapping("/profile/emergency-contact")
+  public ResponseEntity<StudentEmergencyContactDto> getEmergencyContact(@RequestAttribute("uid") Long uid) {
+    return ResponseEntity.ok(studentService.getEmergencyContact(uid));
+  }
+
+  @PutMapping("/profile/emergency-contact")
+  public ResponseEntity<StudentEmergencyContactDto> updateEmergencyContact(@RequestAttribute("uid") Long uid,
+                                                                           @RequestBody StudentEmergencyContactUpdateRequest req) {
+    return ResponseEntity.ok(studentService.updateEmergencyContact(uid, req));
   }
 }

@@ -6,6 +6,7 @@
       {{user && user.roleCode === 'STUDENT' ? '学生' : (user && user.roleCode === 'TEACHER' ? '教师' : '用户')}}
     </view>
     <view class="sub">欢迎来到在线课堂，开始你的学习之旅</view>
+    <view wx:if="{{user && user.roleCode === 'STUDENT'}}" class="profileLink" bindtap="goEmergencyContact">紧急联络人 ›</view>
   </view>
 
   <view class="content">

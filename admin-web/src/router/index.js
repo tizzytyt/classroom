@@ -7,6 +7,7 @@ import Dashboard from '../views/admin/Dashboard.vue'
 import TeacherLayout from '../layouts/TeacherLayout.vue'
 import TeacherGrades from '../views/teacher/TeacherGrades.vue'
 import TeacherProgress from '../views/teacher/TeacherProgress.vue'
+import TeacherCheckins from '../views/teacher/TeacherCheckins.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,6 +22,7 @@ const router = createRouter({
         { path: '', redirect: '/teacher/grades' },
         { path: 'grades', name: 'teacherGrades', component: TeacherGrades, meta: { title: '成绩' } },
         { path: 'progress', name: 'teacherProgress', component: TeacherProgress, meta: { title: '学习进度' } },
+        { path: 'checkins', name: 'teacherCheckins', component: TeacherCheckins, meta: { title: '签到管理' } },
       ],
     },
     {

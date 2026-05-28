@@ -90,7 +90,6 @@ onMounted(init)
       <table class="table">
         <thead>
           <tr>
-            <th style="width: 120px">学生ID</th>
             <th style="width: 160px">姓名</th>
             <th style="width: 120px">资源完成</th>
             <th style="width: 120px">作业完成</th>
@@ -102,10 +101,9 @@ onMounted(init)
         </thead>
         <tbody>
           <tr v-if="!loading && rows.length === 0">
-            <td colspan="8" class="table__empty">暂无数据</td>
+            <td colspan="7" class="table__empty">暂无数据</td>
           </tr>
           <tr v-for="r in rows" :key="r.studentId">
-            <td>{{ r.studentId }}</td>
             <td>{{ r.studentName || '-' }}</td>
             <td>{{ r.completedResources ?? 0 }}/{{ r.totalResources ?? 0 }}（{{ pct(r.resourceCompletionRate) }}）</td>
             <td>{{ r.submittedAssignments ?? 0 }}/{{ r.totalAssignments ?? 0 }}（{{ pct(r.homeworkCompletionRate) }}）</td>

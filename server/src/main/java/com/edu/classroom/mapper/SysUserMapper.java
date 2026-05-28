@@ -24,6 +24,7 @@ public interface SysUserMapper {
   Long generateId();
   int insert(SysUser user);
   int updateProfile(SysUser user);
+  int updateEmergencyContact(SysUser user);
   int updateRole(@Param("id") Long id, @Param("roleCode") String roleCode);
   int updateStatus(@Param("id") Long id, @Param("status") Integer status);
   int updatePasswordHash(@Param("id") Long id, @Param("passwordHash") String passwordHash);

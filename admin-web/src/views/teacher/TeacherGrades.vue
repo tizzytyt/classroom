@@ -106,7 +106,6 @@ onMounted(init)
       <table class="table">
         <thead>
           <tr>
-            <th style="width: 120px">学生ID</th>
             <th style="width: 160px">姓名</th>
             <th style="width: 110px">作业</th>
             <th style="width: 110px">签到</th>
@@ -117,10 +116,9 @@ onMounted(init)
         </thead>
         <tbody>
           <tr v-if="!loading && rows.length === 0">
-            <td colspan="7" class="table__empty">暂无数据</td>
+            <td colspan="6" class="table__empty">暂无数据</td>
           </tr>
           <tr v-for="r in rows" :key="r.studentId">
-            <td>{{ r.studentId }}</td>
             <td>{{ r.studentName || '-' }}</td>
             <td>{{ fmt(r.assignmentScore) }}</td>
             <td>{{ fmt(r.checkinScore) }}</td>

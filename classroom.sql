@@ -369,6 +369,9 @@ CREATE TABLE `sys_user`  (
   `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `avatar_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `emergency_contact_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '紧急联络人姓名',
+  `emergency_contact_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '紧急联络人电话',
+  `emergency_contact_relation` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '与本人关系',
   `status` tinyint NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -537,11 +540,11 @@ INSERT INTO `course_final_grade` VALUES (96006, 3013, 2005, 72.00, 100.00, 85.00
 INSERT INTO `course_final_grade` VALUES (96007, 3014, 2001, 90.00, 100.00, 100.00, 0.00, 91.00, '2026-04-05 18:00:00');
 INSERT INTO `course_final_grade` VALUES (96008, 3018, 2002, 86.00, 100.00, 90.00, 79.00, 85.60, '2026-04-05 18:00:00');
 
-INSERT INTO `exam_paper` VALUES (88301, 3011, '数据库期中测验', 60, '2026-04-01 00:00:00', '2026-06-30 23:59:59', 1001, 1, '2026-03-28 10:00:00');
-INSERT INTO `exam_paper` VALUES (88302, 3011, 'SQL 基础小测', 30, '2026-04-01 00:00:00', '2026-06-30 23:59:59', 1001, 1, '2026-03-29 10:00:00');
-INSERT INTO `exam_paper` VALUES (88303, 3011, '第7章草稿卷', 45, NULL, NULL, 1001, 0, '2026-03-30 10:00:00');
-INSERT INTO `exam_paper` VALUES (88304, 3013, 'Java 基础测验', 45, '2026-04-01 00:00:00', '2026-06-30 23:59:59', 1002, 1, '2026-03-29 14:00:00');
-INSERT INTO `exam_paper` VALUES (88305, 3018, '数据结构单元测', 90, '2026-04-01 00:00:00', '2026-06-30 23:59:59', 1002, 1, '2026-03-30 09:00:00');
+INSERT INTO `exam_paper` VALUES (88301, 3011, '数据库期中测验', 60, '2026-04-01 00:00:00', '2026-06-30 23:59:59', 0, 1001, 1, '2026-03-28 10:00:00');
+INSERT INTO `exam_paper` VALUES (88302, 3011, 'SQL 基础小测', 30, '2026-04-01 00:00:00', '2026-06-30 23:59:59', 0, 1001, 1, '2026-03-29 10:00:00');
+INSERT INTO `exam_paper` VALUES (88303, 3011, '第7章草稿卷', 45, NULL, NULL, 0, 1001, 0, '2026-03-30 10:00:00');
+INSERT INTO `exam_paper` VALUES (88304, 3013, 'Java 基础测验', 45, '2026-04-01 00:00:00', '2026-06-30 23:59:59', 0, 1002, 1, '2026-03-29 14:00:00');
+INSERT INTO `exam_paper` VALUES (88305, 3018, '数据结构单元测', 90, '2026-04-01 00:00:00', '2026-06-30 23:59:59', 0, 1002, 1, '2026-03-30 09:00:00');
 
 INSERT INTO `exam_question` VALUES (89301, 88301, 1, '关系数据库的三大范式主要解决什么问题？', 5.00, 1, 'B', 1);
 INSERT INTO `exam_question` VALUES (89302, 88301, 1, '下列哪一项是事务的 ACID 特性之一？', 5.00, 2, 'A', 1);

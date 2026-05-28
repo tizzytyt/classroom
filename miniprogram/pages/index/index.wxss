@@ -35,6 +35,12 @@
   color: #666666;
 }
 
+.profileLink {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: #4b7cff;
+}
+
 .content {
   margin-top: 0;
   padding: 0 24rpx 32rpx;

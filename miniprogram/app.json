@@ -4,6 +4,7 @@
     "pages/admin/users/users",
     "pages/admin/user-form/user-form",
     "pages/index/index",
+    "pages/profile/emergency-contact/emergency-contact",
     "pages/course/detail/detail",
     "pages/course/resources/resources",
     "pages/course/recordings/recordings",

@@ -10,6 +10,7 @@ const user = computed(() => getUser())
 const nav = [
   { name: '成绩', to: '/teacher/grades' },
   { name: '学习进度', to: '/teacher/progress' },
+  { name: '签到管理', to: '/teacher/checkins' },
 ]
 
 function isActive(to) {
