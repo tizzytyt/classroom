@@ -141,11 +141,16 @@
           and not exists (
             select 1
             from exam_question q
-            left join exam_answer ea on ea.attempt_id = a.id and ea.question_id = q.id
             where q.paper_id = a.paper_id
               and q.status = 1
               and q.q_type = 5
-              and (ea.id is null or ea.score is null)
+              and not exists (
+                select 1
+                from exam_answer ea
+                where ea.attempt_id = a.id
+                  and ea.question_id = q.id
+                  and ea.score is not null
+              )
           )
       ) as my_best_score
     from exam_paper p
@@ -233,11 +238,16 @@
              when not exists (
                select 1
                from exam_question q
-               left join exam_answer ea2 on ea2.attempt_id = a.id and ea2.question_id = q.id
                where q.paper_id = a.paper_id
                  and q.status = 1
                  and q.q_type = 5
-                 and (ea2.id is null or ea2.score is null)
+                 and not exists (
+                   select 1
+                   from exam_answer ea2
+                   where ea2.attempt_id = a.id
+                     and ea2.question_id = q.id
+                     and ea2.score is not null
+                 )
              ) then 1
              else 0
            end as graded
@@ -422,11 +432,16 @@
       and not exists (
         select 1
         from exam_question q
-        left join exam_answer ea on ea.attempt_id = a.id and ea.question_id = q.id
         where q.paper_id = a.paper_id
           and q.status = 1
           and q.q_type = 5
-          and (ea.id is null or ea.score is null)
+          and not exists (
+            select 1
+            from exam_answer ea
+            where ea.attempt_id = a.id
+              and ea.question_id = q.id
+              and ea.score is not null
+          )
       )
   </select>
 
@@ -443,11 +458,16 @@
       and exists (
         select 1
         from exam_question q
-        left join exam_answer ea on ea.attempt_id = a.id and ea.question_id = q.id
         where q.paper_id = a.paper_id
           and q.status = 1
           and q.q_type = 5
-          and (ea.id is null or ea.score is null)
+          and not exists (
+            select 1
+            from exam_answer ea
+            where ea.attempt_id = a.id
+              and ea.question_id = q.id
+              and ea.score is not null
+          )
       )
   </select>
 </mapper>

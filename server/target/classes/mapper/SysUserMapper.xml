@@ -10,20 +10,27 @@
     <result property="phone" column="phone"/>
     <result property="email" column="email"/>
     <result property="avatarUrl" column="avatar_url"/>
+    <result property="emergencyContactName" column="emergency_contact_name"/>
+    <result property="emergencyContactPhone" column="emergency_contact_phone"/>
+    <result property="emergencyContactRelation" column="emergency_contact_relation"/>
     <result property="status" column="status"/>
     <result property="createdAt" column="created_at"/>
     <result property="updatedAt" column="updated_at"/>
   </resultMap>
 
   <select id="findByUsername" parameterType="string" resultMap="SysUserMap">
-    select id, username, password_hash, real_name, role_code, phone, email, avatar_url, status, created_at, updated_at
+    select id, username, password_hash, real_name, role_code, phone, email, avatar_url,
+           emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+           status, created_at, updated_at
     from sys_user
     where username = #{username}
     limit 1
   </select>
 
   <select id="findById" parameterType="long" resultMap="SysUserMap">
-    select id, username, password_hash, real_name, role_code, phone, email, avatar_url, status, created_at, updated_at
+    select id, username, password_hash, real_name, role_code, phone, email, avatar_url,
+           emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+           status, created_at, updated_at
     from sys_user
     where id = #{id}
     limit 1
@@ -44,7 +51,9 @@
   </sql>
 
   <select id="list" resultMap="SysUserMap">
-    select id, username, password_hash, real_name, role_code, phone, email, avatar_url, status, created_at, updated_at
+    select id, username, password_hash, real_name, role_code, phone, email, avatar_url,
+           emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+           status, created_at, updated_at
     from sys_user
     <include refid="UserWhere"/>
     order by id desc
@@ -72,6 +81,15 @@
         phone = #{phone},
         email = #{email},
         avatar_url = #{avatarUrl},
+        updated_at = now()
+    where id = #{id}
+  </update>
+
+  <update id="updateEmergencyContact" parameterType="com.edu.classroom.entity.SysUser">
+    update sys_user
+    set emergency_contact_name = #{emergencyContactName},
+        emergency_contact_phone = #{emergencyContactPhone},
+        emergency_contact_relation = #{emergencyContactRelation},
         updated_at = now()
     where id = #{id}
   </update>
